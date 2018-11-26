@@ -612,6 +612,34 @@ object KeYmaeraXParser extends Parser with TokenParser with Logging {
 //        if (la==EOF || la==RPAREN || la==RBRACE || formulaBinOp(la)) && e1.kind!=FormulaKind =>
 //        reduce(st, 1, elaborate(st, OpSpec.sNone, FormulaKind, e1), r :+ tok1 :+ Expr(p1) :+ tok3)
 
+      /** 15624: DA actions */
+      case r :+ (tok@Token(DEXISTS, _)) =>
+        println("Found dexists")
+        if (la == LBRACE)
+          reduce(shift(st), 1, VariableList(Seq()), r :+ tok)
+        else
+          error(st, List(LBRACE))
+
+      case r :+ Expr(vs: VariableList) =>
+        println("Found varlist")
+        if (la == RBRACE) {
+          println("Closing varlist")
+          shift(reduce(shift(st), 2, Expr(vs), r))
+        } else if (la.isInstanceOf[IDENT]) {
+          println("LA ident")
+          shift(st)
+        } else {
+          error(st, List(RBRACE, IDENT("IDENT")))
+        }
+
+      case r :+ Expr(VariableList(xs)) :+ Expr(x: Variable) =>
+        println("Reducing ident")
+        reduce(st, 2, VariableList(xs :+ x), r)
+
+      case r :+ Token(DEXISTS, _) :+ Expr(VariableList(xs)) :+ Expr(odesys:ODESystem) =>
+        println("Parsed odesys!")
+        reduce(st, 3, DASystem(xs, odesys), r)
+
       // special case to force elaboration to DifferentialProgramConst {c} and {c,...} and {c&...}
       case r :+ (tok1@Token(LBRACE,_)) :+ Expr(e1:Variable) if la==AMP || la==COMMA || la==RBRACE =>
         assume((r match {case _ :+ Token(id:IDENT,_) => false case _ => true}), "IDENT stack for predicationals has already been handled")
@@ -998,7 +1026,8 @@ object KeYmaeraXParser extends Parser with TokenParser with Logging {
     la==NOT || la==FORALL || la==EXISTS || la==LBOX || la==LDIA || la==TRUE || la==FALSE || la==PLACE /*|| la==LPAREN */
 
   /** First(Program): Is la the beginning of a new program? */
-  private def firstProgram(la: Terminal): Boolean = la.isInstanceOf[IDENT] || la==TEST || la==LBRACE || la==IF
+  /** 15624: Modified first */
+  private def firstProgram(la: Terminal): Boolean = la.isInstanceOf[IDENT] || la==TEST || la==LBRACE || la==IF || la == DEXISTS
 
   // FOLLOW sets
 

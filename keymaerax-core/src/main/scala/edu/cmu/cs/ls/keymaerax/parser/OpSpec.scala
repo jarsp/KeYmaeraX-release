@@ -244,6 +244,9 @@ object OpSpec {
   private val unfmlprog = (FormulaKind)
   private val diffprogfmlprog = (DifferentialProgramKind,FormulaKind)
 
+  /** 15624: For DAL */
+  private val termprog = (TermKind, ProgramKind)
+
   val sProgramConst = UnitOpSpec(none,    0, name => ProgramConst(name))
   val sSystemConst = UnitOpSpec(none,    0, name => SystemConst(name))
   val sDifferentialProgramConst = UnitOpSpec(none,  0, name => DifferentialProgramConst(name, AnyArg))
@@ -262,6 +265,10 @@ object OpSpec {
   val sAtomicODE    = BinaryOpSpec[Program](EQ,        90, AtomicBinaryFormat, bintermprog, (_:String, xp:Expression, e:Expression) => AtomicODE(xp.asInstanceOf[DifferentialSymbol], e.asInstanceOf[Term]))
   val sDifferentialProduct = BinaryOpSpec(COMMA,       95, RightAssociative, bindiffprog, DifferentialProduct.apply _)
   val sODESystem    = BinaryOpSpec[Expression](AMP,   150, NonAssociative, diffprogfmlprog, (_:String, ode:Expression, h:Expression) => ODESystem(ode.asInstanceOf[DifferentialProgram], h.asInstanceOf[Formula]))
+
+  /** 15624: For DAL */
+  val sDASystem     = BinaryOpSpec[Expression](DEXISTS, 150, MixedBinary, termprog, (_:String, xs:Expression, odesys:Expression) => DASystem(xs.asInstanceOf[VariableList].xs, odesys.asInstanceOf[ODESystem]))
+
   val sLoop         = UnaryOpSpec[Program](STAR,      220, PostfixFormat, unprog, Loop.apply _)
   val sDual         = UnaryOpSpec[Program](DUAL,      220, PostfixFormat, unprog, Dual.apply _)
   val sCompose      = BinaryOpSpec[Program](SEMI,     230, RightAssociative, binprog, Compose.apply _) //@todo compatibility mode for parser

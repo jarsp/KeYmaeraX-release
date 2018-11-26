@@ -15,6 +15,8 @@ package edu.cmu.cs.ls.keymaerax.core
 
 // require favoring immutable Seqs for soundness
 
+import edu.cmu.cs.ls.keymaerax.parser.KeYmaeraXPrettyPrinter
+
 import scala.collection.immutable
 import scala.math._
 
@@ -51,6 +53,9 @@ object Trafo extends Sort { override def toString = "Trafo" }
 case class Tuple(left: Sort, right: Sort) extends Sort { override def toString = "(" + left + "," + right + ")" }
 /** User-defined object sort */
 case class ObjectSort(name : String) extends Sort { override def toString = name }
+
+/** 15624: Sort of variable lists */
+object VariableListSort extends Sort { override def toString = "VariableList" }
 
 /** Sorts of state spaces for state-dependent operators */
 sealed trait Space
@@ -175,6 +180,14 @@ sealed trait SpaceDependent extends StateDependent {
   /** The space that this expression lives on. */
   val space: Space
   final val index: Option[Int] = None
+}
+
+/** 15624: Expression representing variable lists */
+sealed trait VariableListT extends Expression {
+  final val kind = TermKind
+  final val sort = VariableListSort
+  val xs: immutable.Seq[Variable]
+  override def toString: String = "{" + xs.map(KeYmaeraXPrettyPrinter.stringify).mkString(" ") + "}"
 }
 
 
@@ -355,6 +368,11 @@ case class Differential(child: Term) extends RUnaryCompositeTerm { def reapply =
 case class Pair(left: Term, right: Term) extends BinaryCompositeTerm {
   def reapply = copy
   final val sort: Sort = Tuple(left.sort, right.sort)
+}
+
+/** 15624: Case class for variable lists */
+case class VariableList(xs: immutable.Seq[Variable]) extends VariableListT {
+  def reapply = copy _
 }
 
 /*********************************************************************************
@@ -577,6 +595,7 @@ case class DifferentialFormula(child: Formula) extends UnaryCompositeFormula { d
   *     - `{a}^d` dual game as [[Dual]]([[Program]]])
   *   - Special
   *     - `{c&Q}` differential equation system as [[ODESystem]]([[DifferentialProgram]], [[Formula]])
+  *     - 15624: `\dexists {v1 v2 v3} {c&Q}` as [[DASystem]]([[Variable]](s), ODESystem)
   * @author Andre Platzer
   * @see [[edu.cmu.cs.ls.keymaerax.parser.KeYmaeraXParser#programParser]]
   */
@@ -655,6 +674,8 @@ case class ODESystem(ode: DifferentialProgram, constraint: Formula = True) exten
   insist(!StaticSemantics.isDifferential(constraint), "No differentials in evolution domain constraints {" + ode + " & " + constraint + "}")
 }
 
+/** 15624: DASystem */
+case class DASystem(vars: immutable.Seq[Variable], child: ODESystem) extends Program
 
 
 /**

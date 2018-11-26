@@ -273,6 +273,7 @@ class KeYmaeraXPrinter extends BasePrettyPrinter {
     case t: UnaryCompositeTerm  => ppOp(t) + wrapChild(t, pp(q++0, t.child))
     case t: BinaryCompositeTerm =>
       wrapLeft(t, pp(q++0, t.left)) + ppOp(t) + wrapRight(t, pp(q++1, t.right))
+    case _ => "-term-"
   })
 
   protected def pp(q: PosInExpr, formula: Formula): String = emit(q, formula match {
@@ -291,6 +292,8 @@ class KeYmaeraXPrinter extends BasePrettyPrinter {
     case t: UnaryCompositeFormula=> ppOp(t) + wrapChild(t, pp(q++0, t.child))
     case t: BinaryCompositeFormula=>
       wrapLeft(t, pp(q++0, t.left)) + ppOp(t) + wrapRight(t, pp(q++1, t.right))
+    /** 15624: */
+    case _ => "-formula-"
   })
 
   protected def pp(q: PosInExpr, program: Program): String = emit(q, program match {
@@ -310,6 +313,8 @@ class KeYmaeraXPrinter extends BasePrettyPrinter {
     //case t: UnaryCompositeProgram=> (if (skipParens(t)) pp(t.child) else "{" + pp(t.child) + "}") + op(program).opcode
     case t: Compose => pwrapLeft(t, pp(q++0, t.left)) + ppOp(t) + pwrapRight(t, pp(q++1, t.right))
     case t: BinaryCompositeProgram => pwrapLeft(t, pp(q++0, t.left)) + ppOp(t) + pwrapRight(t, pp(q++1, t.right))
+    /** 15624: blah */
+    case _ => "-program-"
   })
 
   protected def ppODE(q: PosInExpr, program: DifferentialProgram): String = emit(q, program match {
@@ -318,6 +323,7 @@ class KeYmaeraXPrinter extends BasePrettyPrinter {
     case t: DifferentialProduct =>
       assert(op(t).assoc==RightAssociative && !t.left.isInstanceOf[DifferentialProduct], "differential products are always right-associative")
       ppODE(q++0, t.left) + ppOp(t) + ppODE(q++1, t.right)
+    case _ => "-ODE-"
   })
 
 

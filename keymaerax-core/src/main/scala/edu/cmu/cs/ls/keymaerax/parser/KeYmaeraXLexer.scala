@@ -152,6 +152,11 @@ private object EXISTS  extends OPERATOR("\\exists") {
   override def regexp: Regex = """\\exists""".r
 }
 
+/** 15624: For DAL */
+private object DEXISTS extends OPERATOR("\\dexists") {
+  override def regexp: Regex = """\\dexists""".r
+}
+
 private object EQ      extends OPERATOR("=")
 private object NOTEQ   extends OPERATOR("!=") {
   override def regexp: Regex = """\!=""".r
@@ -646,6 +651,9 @@ object KeYmaeraXLexer extends ((String) => List[Token]) with Logging {
       case FORALL_UNICODE.startPattern(_*) => consumeUnicodeTerminalLength(FORALL_UNICODE, loc, FORALL)
       case EXISTS.startPattern(_*) => consumeTerminalLength(EXISTS, loc)
       case EXISTS_UNICODE.startPattern(_*) => consumeUnicodeTerminalLength(EXISTS_UNICODE, loc, EXISTS)
+
+      /** 15624: For DAL */
+      case DEXISTS.startPattern(_*) => consumeTerminalLength(DEXISTS, loc)
 
       case EQ.startPattern(_*) => consumeTerminalLength(EQ, loc)
       case UNEQUAL_UNICODE.startPattern(_*) => ???
