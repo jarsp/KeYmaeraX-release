@@ -643,7 +643,12 @@ object KeYmaeraXParser extends Parser with TokenParser with Logging {
 
       case r :+ RecognizedDAVarList(xs) :+ Expr(x: Variable) =>
         println("Reducing ident")
-        reduce(st, 2, RecognizedDAVarList(xs :+ x), r)
+        if (la == COMMA)
+          reduce(shift(st), 3, RecognizedDAVarList(xs :+ x), r)
+        else if (la == RBRACE)
+          reduce(st, 2, RecognizedDAVarList(xs :+ x), r)
+        else
+          error(st, List(RBRACE, COMMA))
 
       case r :+ Token(DEXISTS, _) :+ RecognizedDAVarList(xs) :+ Expr(odesys:ODESystem) =>
         println("Parsed odesys!")
@@ -1065,7 +1070,7 @@ object KeYmaeraXParser extends Parser with TokenParser with Logging {
     followsFormula(la) ||
     (if (statementSemicolon) la==SEMI || la==RBRACE || la==AMP
     else la==SEMI || la==CHOICE || la==STAR || la==RBRACE || la==COMMA) || // from T in programs
-    la == COMMA || // from T in ODE systems
+    la == COMMA || // from T in ODE systems, 15624: from VariableList
     la==PRIME || la==EOF
 
   /** Is la a (binary) operator that only works for terms? */

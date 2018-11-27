@@ -316,7 +316,7 @@ class KeYmaeraXPrinter extends BasePrettyPrinter {
     case t: Compose => pwrapLeft(t, pp(q++0, t.left)) + ppOp(t) + pwrapRight(t, pp(q++1, t.right))
     case t: BinaryCompositeProgram => pwrapLeft(t, pp(q++0, t.left)) + ppOp(t) + pwrapRight(t, pp(q++1, t.right))
     /** 15624: blah */
-    case DASystem(xs, ode)      => "\\dexists{" + xs.map(stringify).mkString(" ") + "}" + pp(q++0, ode)
+    case DASystem(xs, ode)      => "\\dexists{" + xs.map(stringify).mkString(",") + "}" + pp(q++0, ode)
     case _ => "-program-"
   })
 
