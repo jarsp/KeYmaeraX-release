@@ -241,6 +241,9 @@ object StaticSemantics {
         VCP(fv = va.fv ++ StaticSemantics(h).fv, bv = va.bv, mbv = va.mbv)
       case DifferentialProduct(a, b) => val va = progVars(a); val vb = progVars(b)
         VCP(fv = va.fv ++ vb.fv, bv = va.bv ++ vb.bv, mbv = va.mbv ++ vb.mbv)
+
+      /** 15624: DASystem */
+      case DASystem(xs, ode) => val va = progVars(ode); VCP(fv = va.fv -- xs, bv = va.bv ++ xs, mbv = va.mbv ++ xs)
     }
   } ensuring(r => {
     val VCP(_, bv, mbv) = r; mbv.subsetOf(bv)
@@ -253,7 +256,7 @@ object StaticSemantics {
     *
     * @note Result will not be order stable, so order could be different on different runs of the prover.
     * @example{{{
-    *    signature(e).toList.sort            // sorts by compare of NamedSymbol, by name and index
+    *    nnature(e).toList.sort            // sorts by compare of NamedSymbol, by name and index
     *    signature(e).toList.sortBy(_.name)  // sorts alphabetically by name, ignores indices
     * }}}
     */
@@ -350,6 +353,9 @@ object StaticSemantics {
     case Dual(a)          => signature(a)
     case ODESystem(a, h)  => signature(a) ++ signature(h)
     case DifferentialProduct(a, b) => signature(a) ++ signature(b)
+
+    /** 15624: Signature for DASystem */
+    case DASystem(xs, ode) => signature(ode)
   }
 
   /**

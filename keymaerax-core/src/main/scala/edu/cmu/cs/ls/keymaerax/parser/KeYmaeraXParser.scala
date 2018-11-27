@@ -46,6 +46,12 @@ private[parser] case class RecognizedModal(ltok: Token, program: Program, rtok: 
   //@NOTE Not just "override def toString = expr.toString" to avoid infinite recursion of KeYmaeraXPrettyPrinter.apply contract checking.
   override def toString: String = "Rec" + ltok.tok.img + KeYmaeraXPrettyPrinter.stringify(program) + rtok.tok.img
 }
+
+/** 15624: Partially parsed variablelist */
+private[parser] case class RecognizedDAVarList(vs: Seq[Variable]) extends Item {
+  override def toString: String = "RecDA(" + vs.map(KeYmaeraXPrettyPrinter.stringify).mkString(",") + ")"
+}
+
 ///** Parts of expressions that are partially recognized on the parser item stack but not parsed to a proper Expression yet so merely stashed for later. */
 //private[parser] case class RecognizedAnnotation(program: Program) extends Item {
 //  //@NOTE Not just "override def toString = expr.toString" to avoid infinite recursion of KeYmaeraXPrettyPrinter.apply contract checking.
@@ -267,6 +273,9 @@ object KeYmaeraXParser extends Parser with TokenParser with Logging {
     //case ode: DifferentialProgramConst if kind==ProgramKind => Some(ProgramConst(ode.name, ode.space))
     // lift differential equations without evolution domain constraints to ODESystems
     case ode: DifferentialProgram if ode.kind==DifferentialProgramKind && kind==ProgramKind => assert(!ode.isInstanceOf[ODESystem], "wrong kind"); Some(ODESystem(ode))
+
+    /** 15624: Elaboration */
+    case das: DASystem if kind == ProgramKind => Some(das)
 
     // space-dependent elaborations
     case UnitPredicational(name, space)    if kind==TermKind => Some(UnitFunctional(name,space,Real))
@@ -616,15 +625,15 @@ object KeYmaeraXParser extends Parser with TokenParser with Logging {
       case r :+ (tok@Token(DEXISTS, _)) =>
         println("Found dexists")
         if (la == LBRACE)
-          reduce(shift(st), 1, VariableList(Seq()), r :+ tok)
+          reduce(shift(st), 1, RecognizedDAVarList(Seq()), r :+ tok)
         else
           error(st, List(LBRACE))
 
-      case r :+ Expr(vs: VariableList) =>
+      case r :+ (vs: RecognizedDAVarList) =>
         println("Found varlist")
         if (la == RBRACE) {
           println("Closing varlist")
-          shift(reduce(shift(st), 2, Expr(vs), r))
+          shift(reduce(shift(st), 2, vs, r))
         } else if (la.isInstanceOf[IDENT]) {
           println("LA ident")
           shift(st)
@@ -632,13 +641,18 @@ object KeYmaeraXParser extends Parser with TokenParser with Logging {
           error(st, List(RBRACE, IDENT("IDENT")))
         }
 
-      case r :+ Expr(VariableList(xs)) :+ Expr(x: Variable) =>
+      case r :+ RecognizedDAVarList(xs) :+ Expr(x: Variable) =>
         println("Reducing ident")
-        reduce(st, 2, VariableList(xs :+ x), r)
+        reduce(st, 2, RecognizedDAVarList(xs :+ x), r)
 
-      case r :+ Token(DEXISTS, _) :+ Expr(VariableList(xs)) :+ Expr(odesys:ODESystem) =>
+      case r :+ Token(DEXISTS, _) :+ RecognizedDAVarList(xs) :+ Expr(odesys:ODESystem) =>
         println("Parsed odesys!")
         reduce(st, 3, DASystem(xs, odesys), r)
+
+      case r :+ (tok1@Token(DEXISTS, _)) :+ (vl:RecognizedDAVarList) :+ Expr(ode:DifferentialProgram) if followsProgram(la) && la != AMP && la != COMMA =>
+        println("Parsed ode dp!")
+        reduce(st, 1, elaborate(st, tok1, OpSpec.sODESystem, ode, True), r :+ tok1 :+ vl)
+
 
       // special case to force elaboration to DifferentialProgramConst {c} and {c,...} and {c&...}
       case r :+ (tok1@Token(LBRACE,_)) :+ Expr(e1:Variable) if la==AMP || la==COMMA || la==RBRACE =>

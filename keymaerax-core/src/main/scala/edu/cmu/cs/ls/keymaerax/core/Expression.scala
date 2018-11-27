@@ -55,7 +55,7 @@ case class Tuple(left: Sort, right: Sort) extends Sort { override def toString =
 case class ObjectSort(name : String) extends Sort { override def toString = name }
 
 /** 15624: Sort of variable lists */
-object VariableListSort extends Sort { override def toString = "VariableList" }
+//object VariableListSort extends Sort { override def toString = "VariableList" }
 
 /** Sorts of state spaces for state-dependent operators */
 sealed trait Space
@@ -183,12 +183,12 @@ sealed trait SpaceDependent extends StateDependent {
 }
 
 /** 15624: Expression representing variable lists */
-sealed trait VariableListT extends Expression {
+/*sealed trait VariableListT extends Expression {
   final val kind = TermKind
   final val sort = VariableListSort
   val xs: immutable.Seq[Variable]
   override def toString: String = "{" + xs.map(KeYmaeraXPrettyPrinter.stringify).mkString(" ") + "}"
-}
+}*/
 
 
 
@@ -371,9 +371,9 @@ case class Pair(left: Term, right: Term) extends BinaryCompositeTerm {
 }
 
 /** 15624: Case class for variable lists */
-case class VariableList(xs: immutable.Seq[Variable]) extends VariableListT {
+/*case class VariableList(xs: immutable.Seq[Variable]) extends VariableListT {
   def reapply = copy _
-}
+}*/
 
 /*********************************************************************************
   * Formulas of differential dynamic logic
@@ -676,7 +676,6 @@ case class ODESystem(ode: DifferentialProgram, constraint: Formula = True) exten
 
 /** 15624: DASystem */
 case class DASystem(vars: immutable.Seq[Variable], child: ODESystem) extends Program
-
 
 /**
   * Differential programs of differential dynamic logic.

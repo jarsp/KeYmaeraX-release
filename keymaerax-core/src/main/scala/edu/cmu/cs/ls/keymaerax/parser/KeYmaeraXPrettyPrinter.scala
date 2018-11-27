@@ -303,10 +303,12 @@ class KeYmaeraXPrinter extends BasePrettyPrinter {
     //case DiffAssign(xp, e)      => statement(pp(q++0, xp) + op(program).opcode + pp(q++1, e))
     case AssignAny(x)           => statement(pp(q++0, x) + ppOp(program))
     case Test(f)                => statement(ppOp(program) + pp(q++0, f))
+    //case ODESystem(ode, f)      => "ODESys" + wrap(ppODE(q++0, ode) + (if (false && f==True) "" else ppOp(program) + pp(q++1, f)), program)
     case ODESystem(ode, f)      => wrap(ppODE(q++0, ode) + (if (false && f==True) "" else ppOp(program) + pp(q++1, f)), program)
     //@note unambiguously reparse as ODE not as equation that happens to involve a differential symbol.
     //@note This is only used in printing internal data structures, not user input.
     //@note no positional change since only internal data structure swap-over
+    //case ode: DifferentialProgram => "DP" + wrap(ppODE(q, ode), program)
     case ode: DifferentialProgram => wrap(ppODE(q, ode), program)
     //@note forced parentheses in grammar for loops and duals
     case t: UnaryCompositeProgram => wrap(pp(q++0, t.child), program) + ppOp(program)
@@ -314,11 +316,13 @@ class KeYmaeraXPrinter extends BasePrettyPrinter {
     case t: Compose => pwrapLeft(t, pp(q++0, t.left)) + ppOp(t) + pwrapRight(t, pp(q++1, t.right))
     case t: BinaryCompositeProgram => pwrapLeft(t, pp(q++0, t.left)) + ppOp(t) + pwrapRight(t, pp(q++1, t.right))
     /** 15624: blah */
+    case DASystem(xs, ode)      => "\\dexists{" + xs.map(stringify).mkString(" ") + "}" + pp(q++0, ode)
     case _ => "-program-"
   })
 
   protected def ppODE(q: PosInExpr, program: DifferentialProgram): String = emit(q, program match {
     case a: DifferentialProgramConst => a.asString
+    //case AtomicODE(xp, e)       => "Atomic(" + pp(q++0, xp) + ppOp(program) + pp(q++1, e) + ")"
     case AtomicODE(xp, e)       => pp(q++0, xp) + ppOp(program) + pp(q++1, e)
     case t: DifferentialProduct =>
       assert(op(t).assoc==RightAssociative && !t.left.isInstanceOf[DifferentialProduct], "differential products are always right-associative")

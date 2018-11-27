@@ -245,7 +245,7 @@ object OpSpec {
   private val diffprogfmlprog = (DifferentialProgramKind,FormulaKind)
 
   /** 15624: For DAL */
-  private val termprog = (TermKind, ProgramKind)
+  //private val termprog = (TermKind, ProgramKind)
 
   val sProgramConst = UnitOpSpec(none,    0, name => ProgramConst(name))
   val sSystemConst = UnitOpSpec(none,    0, name => SystemConst(name))
@@ -267,7 +267,7 @@ object OpSpec {
   val sODESystem    = BinaryOpSpec[Expression](AMP,   150, NonAssociative, diffprogfmlprog, (_:String, ode:Expression, h:Expression) => ODESystem(ode.asInstanceOf[DifferentialProgram], h.asInstanceOf[Formula]))
 
   /** 15624: For DAL */
-  val sDASystem     = BinaryOpSpec[Expression](DEXISTS, 150, MixedBinary, termprog, (_:String, xs:Expression, odesys:Expression) => DASystem(xs.asInstanceOf[VariableList].xs, odesys.asInstanceOf[ODESystem]))
+  //val sDASystem     = BinaryOpSpec[Expression](DEXISTS, 150, MixedBinary, termprog, (_:String, xs:Expression, odesys:Expression) => DASystem(xs.asInstanceOf[VariableList].xs, odesys.asInstanceOf[ODESystem]))
 
   val sLoop         = UnaryOpSpec[Program](STAR,      220, PostfixFormat, unprog, Loop.apply _)
   val sDual         = UnaryOpSpec[Program](DUAL,      220, PostfixFormat, unprog, Dual.apply _)
