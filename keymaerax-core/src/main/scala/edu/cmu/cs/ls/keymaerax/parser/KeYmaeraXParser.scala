@@ -643,6 +643,8 @@ object KeYmaeraXParser extends Parser with TokenParser with Logging {
 
       case r :+ RecognizedDAVarList(xs) :+ Expr(x: Variable) =>
         println("Reducing ident")
+        if (isOrContainsDifferentialSymbol(x))
+          throw ParseException("Cannot quantify over differentials", st, List[Expected](RBRACE, COMMA))
         if (la == COMMA)
           reduce(shift(st), 3, RecognizedDAVarList(xs :+ x), r)
         else if (la == RBRACE)
