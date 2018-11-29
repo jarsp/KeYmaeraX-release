@@ -471,6 +471,22 @@ final case class USubst(subsDefsInput: immutable.Seq[SubstitutionPair]) extends 
         //@note requireAdmissible(StaticSemantics(usubst(ode, SetLattice.bottom)).bv, ...) would be sound just more permissive
         requireAdmissible(StaticSemantics(ode).bv, h, program)
         ODESystem(usubst(ode), usubst(h))
+
+      /** 15624
+        *
+        * Uniform substitution and admissibility rules for DASystem
+        */
+      case DASystem(vars, child@(ODESystem(ode, h))) =>
+        //@note similar to forall/exists cases, the substitution should be vars-admissible for the child ode.
+        //@note also need to check substitution admissibility for the child ode.
+        requireAdmissible(SetLattice(vars), child, program)
+        /*
+        //@note context (last argument of requireAdmissible) is currently only used to help print exception messages.
+        //@note not actually used in the logic.
+        requireAdmissible(StaticSemantics(ode).bv, h, child)
+        */
+        DASystem(vars, usubst(child).asInstanceOf[ODESystem])
+
       case Choice(a, b)      => Choice(usubst(a), usubst(b))
       case Compose(a, b)     => requireAdmissible(StaticSemantics(usubst(a)).bv, b, program)
         Compose(usubst(a), usubst(b))
