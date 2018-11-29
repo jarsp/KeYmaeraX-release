@@ -243,7 +243,7 @@ object StaticSemantics {
         VCP(fv = va.fv ++ vb.fv, bv = va.bv ++ vb.bv, mbv = va.mbv ++ vb.mbv)
 
       /** 15624: DASystem */
-      case DASystem(xs, ode) => val va = progVars(ode); VCP(fv = va.fv -- xs, bv = va.bv ++ xs, mbv = va.mbv ++ xs)
+      case DASystem(xs, ode) => val va = progVars(ode); VCP(fv = va.fv -- xs, bv = va.bv, mbv = va.mbv)
     }
   } ensuring(r => {
     val VCP(_, bv, mbv) = r; mbv.subsetOf(bv)
