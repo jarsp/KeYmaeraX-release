@@ -357,6 +357,13 @@ abstract class SchematicUnificationMatch extends BaseMatcher {
     case Compose(a, b)               => e2 match {case Compose(a2,b2)   => unifies(a,b, a2,b2) case _ => ununifiable(e1,e2)}
     case Loop(a)                     => e2 match {case Loop(a2)         => unify(a,a2) case _ => ununifiable(e1,e2)}
     case Dual(a)                     => e2 match {case Dual(a2)         => unify(a,a2) case _ => ununifiable(e1,e2)}
+
+    /** 15624: Unification for DASystems */
+    case DASystem(v, ode) if v.length == 1 =>
+      e2 match {
+        case DASystem(v2, ode2) if v2.length == 1 => unifies(v.head, ode, v2.head, ode2)
+        case _ => ununifiable(e1,e2)
+      }
   }
 
   /** A simple recursive unification algorithm that actually just recursive single-sided matching without occurs check */
