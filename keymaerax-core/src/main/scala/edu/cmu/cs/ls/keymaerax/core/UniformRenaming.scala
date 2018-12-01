@@ -139,6 +139,10 @@ final case class URename(what: Variable, repl: Variable) extends (Expression => 
     case AssignAny(x)                => AssignAny(renameVar(x,program))
     case Test(f)                     => Test(rename(f))
     case ODESystem(a, h)             => ODESystem(renameODE(a), rename(h))
+
+    /* 15624 */
+    case DASystem(v, ode)            => DASystem(v.map(x => renameVar(x, program)), rename(ode).asInstanceOf[ODESystem])
+
     //@note This case happens for standalone uniform substitutions on differential programs such as x'=f() or c as they come up in unification for example.
     case ode: DifferentialProgram    => renameODE(ode)
     //@note the following cases are equivalent to f.reapply but are left explicit to enforce revisiting this case when data structure changes.

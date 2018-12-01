@@ -242,6 +242,15 @@ final case class USubstRen(private[bellerophon] val subsDefsInput: immutable.Seq
         //@note requireAdmissible(StaticSemantics(usubstODE(ode, SetLattice.bottom)).bv, ...) would be sound just more permissive
         requireAdmissible(StaticSemantics(ode).bv, h, program)
         ODESystem(usubst(ode), usubst(h))
+
+      /** 15624
+        *
+        * Uniform substitution and admissibility rules for DASystem
+        */
+      case DASystem(vars, child) =>
+        requireAdmissible(SetLattice(vars), child, program)
+        DASystem(vars, usubst(child).asInstanceOf[ODESystem])
+
       case Choice(a, b)      => Choice(usubst(a), usubst(b))
       case Compose(a, b)     => requireAdmissible(StaticSemantics(usubst(a)).bv, b, program)
         Compose(usubst(a), usubst(b))

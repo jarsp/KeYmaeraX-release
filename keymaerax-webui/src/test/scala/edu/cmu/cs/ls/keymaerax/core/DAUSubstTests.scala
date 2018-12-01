@@ -71,4 +71,12 @@ class DAUSubstTests extends SystemTestBase {
 
     a [SubstitutionClashException] should be thrownBy(s(prem))
   }
+
+  it should "test" in {
+    val p = "[a;]p() -> [a;]q()".asFormula
+    val s = USubst(("p()".asFormula ~> "x=1".asFormula)::("q()".asFormula ~> "y > 0".asFormula)::
+      ("a".asProgram ~> "\\dexists {y} {x' = y}".asProgram)::Nil)
+
+    a [SubstitutionClashException] should be thrownBy(s(p))
+  }
 }

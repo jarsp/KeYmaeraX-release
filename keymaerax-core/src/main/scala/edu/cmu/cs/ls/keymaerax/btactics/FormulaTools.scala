@@ -304,6 +304,7 @@ object FormulaTools extends Logging {
     case AssignAny(x)    => true
     case Test(f)         => true /* even if f contains duals, since they're different nested games) */
     case ODESystem(a, h) => true /*|| dualFreeODE(a)*/ /* @note Optimized assuming no differential games */
+    case DASystem(v, c)  => true
     case Choice(a, b)    => dualFree(a) && dualFree(b)
     case Compose(a, b)   => dualFree(a) && dualFree(b)
     case Loop(a)         => dualFree(a)

@@ -91,6 +91,10 @@ final case class SubstitutionPair (what: Expression, repl: Expression) {
     case AssignAny(x)    => true
     case Test(f)         => true /* even if f contains duals, since they're different nested games) */
     case ODESystem(a, h) => true /*|| dualFreeODE(a)*/ /* @note Optimized assuming no differential games */
+
+    /* 15624 */
+    case DASystem(v, ode) => true
+
     case Choice(a, b)    => dualFree(a) && dualFree(b)
     case Compose(a, b)   => dualFree(a) && dualFree(b)
     case Loop(a)         => dualFree(a)
