@@ -51,6 +51,9 @@ object AxiomIndex extends Logging {
     case "<?> invtest" => (PosInExpr(0::Nil), PosInExpr(1::Nil)::Nil)
     case "&true inv" => (PosInExpr(0::Nil), PosInExpr(Nil)::Nil)
 
+    /** 15624 */
+    case "DAW base"            => (PosInExpr(Nil), Nil)
+
     case "DW base"              => (PosInExpr(Nil), Nil)
     case "DC differential cut" => (PosInExpr(1::0::Nil), PosInExpr(Nil)::Nil)
     case "DCd diamond differential cut" => (PosInExpr(1::0::Nil), PosInExpr(Nil)::Nil)

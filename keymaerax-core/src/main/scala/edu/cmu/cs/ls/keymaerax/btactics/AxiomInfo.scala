@@ -177,6 +177,10 @@ object DerivationInfo {
       , "boxTrue", {case () => HilbertCalculus.boxTrue}),
 
     // differential equation axioms
+
+    /** 15624 */
+    new CoreAxiomInfo("DAW base", "DAWbase", "DAWbase", {case () => HilbertCalculus.DW}),
+
     new CoreAxiomInfo("DW base", "DWbase", "DWbase", {case () => HilbertCalculus.DW}),
     new PositionTacticInfo("dW"
       , RuleDisplayInfo("Differential Weaken"

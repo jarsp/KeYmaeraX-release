@@ -208,6 +208,9 @@ object Context {
     case ODESystem(ode, h) if pos.head==0 => val sp = contextODE(ode, pos.child); (ODESystem(sp._1, h), sp._2)
     case ODESystem(ode, h) if pos.head==1 => val sp = context(h, pos.child); (ODESystem(ode, sp._1), sp._2)
 
+    /** 15624 */
+    case DASystem(vars, ode) if pos.head==0 => val sp = context(ode, pos.child); (DASystem(vars, sp._1.asInstanceOf[ODESystem]), sp._2)
+
     // homomorphic cases
     case f:UnaryCompositeProgram  if pos.head==0 => val sp = context(f.child, pos.child); (f.reapply(sp._1), sp._2)
     case f:BinaryCompositeProgram if pos.head==0 => val sp = context(f.left, pos.child); (f.reapply(sp._1, f.right), sp._2)
@@ -269,6 +272,9 @@ object Context {
 
     case ODESystem(ode, h) if pos.head==0 => partODE(ode, pos.child)
     case ODESystem(ode, h) if pos.head==1 => part(h, pos.child)
+
+    /** 15624 */
+    case DASystem(vars, ode) if pos.head == 0 => part(ode, pos.child)
 
     // homomorphic cases
     case f:UnaryCompositeProgram  if pos.head==0 => part(f.child, pos.child)
@@ -357,6 +363,9 @@ object Context {
 
     case ODESystem(ode, h) if pos.head==0 => ODESystem(replaceAtODE(ode, pos.child, repl), h)
     case ODESystem(ode, h) if pos.head==1 => ODESystem(ode, replaceAt(h, pos.child, repl))
+
+    /** 15624 */
+    case DASystem(vars, ode) if pos.head==0 => DASystem(vars, replaceAt(ode, pos.child, repl).asInstanceOf[ODESystem])
 
     // homomorphic cases
     case f:UnaryCompositeProgram  if pos.head==0 => f.reapply(replaceAt(f.child, pos.child, repl))
@@ -452,6 +461,9 @@ object Context {
 
     case ODESystem(ode, h) if pos.head==0 => val sp = splitODE(ode, pos.child); (ODESystem(sp._1, h), sp._2)
     case ODESystem(ode, h) if pos.head==1 => val sp = split(h, pos.child); (ODESystem(ode, sp._1), sp._2)
+
+    /** 15624 */
+    case DASystem(vars, ode) if pos.head==0 => val sp = split(ode, pos.child); (DASystem(vars, sp._1.asInstanceOf[ODESystem]), sp._2)
 
     // homomorphic cases
     case Choice(f,g)       if pos.head==0 => val sp = split(f, pos.child); (Choice(sp._1, g), sp._2)

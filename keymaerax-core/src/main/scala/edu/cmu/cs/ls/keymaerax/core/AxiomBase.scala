@@ -301,6 +301,11 @@ Axiom "[*] iterate".
   [{a;}*]p(||) <-> (p(||) & [a;][{a;}*]p(||))
 End.
 
+/** 15624 */
+Axiom "DAW base".
+  \forall x [\dexists{x}{c&q(||)}]q(||)
+End.
+
 
 Axiom "DW base".
   [{c&q(||)}]q(||)

@@ -623,26 +623,26 @@ object KeYmaeraXParser extends Parser with TokenParser with Logging {
 
       /** 15624: DA actions */
       case r :+ (tok@Token(DEXISTS, _)) =>
-        println("Found dexists")
+        //println("Found dexists")
         if (la == LBRACE)
           reduce(shift(st), 1, RecognizedDAVarList(Seq()), r :+ tok)
         else
           error(st, List(LBRACE))
 
       case r :+ (vs: RecognizedDAVarList) =>
-        println("Found varlist")
+        //println("Found varlist")
         if (la == RBRACE) {
-          println("Closing varlist")
+          //println("Closing varlist")
           shift(reduce(shift(st), 2, vs, r))
         } else if (la.isInstanceOf[IDENT]) {
-          println("LA ident")
+          //println("LA ident")
           shift(st)
         } else {
           error(st, List(RBRACE, IDENT("IDENT")))
         }
 
       case r :+ RecognizedDAVarList(xs) :+ Expr(x: Variable) =>
-        println("Reducing ident")
+        //println("Reducing ident")
         if (isOrContainsDifferentialSymbol(x))
           throw ParseException("Cannot quantify over differentials", st, List[Expected](RBRACE, COMMA))
         if (la == COMMA)
@@ -653,11 +653,11 @@ object KeYmaeraXParser extends Parser with TokenParser with Logging {
           error(st, List(RBRACE, COMMA))
 
       case r :+ Token(DEXISTS, _) :+ RecognizedDAVarList(xs) :+ Expr(odesys:ODESystem) =>
-        println("Parsed odesys!")
+        //println("Parsed odesys!")
         reduce(st, 3, DASystem(xs, odesys), r)
 
       case r :+ (tok1@Token(DEXISTS, _)) :+ (vl:RecognizedDAVarList) :+ Expr(ode:DifferentialProgram) if followsProgram(la) && la != AMP && la != COMMA =>
-        println("Parsed ode dp!")
+        //println("Parsed ode dp!")
         reduce(st, 1, elaborate(st, tok1, OpSpec.sODESystem, ode, True), r :+ tok1 :+ vl)
 
 
