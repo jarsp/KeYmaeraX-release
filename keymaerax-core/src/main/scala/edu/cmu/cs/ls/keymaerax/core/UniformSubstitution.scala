@@ -93,7 +93,8 @@ final case class SubstitutionPair (what: Expression, repl: Expression) {
     case ODESystem(a, h) => true /*|| dualFreeODE(a)*/ /* @note Optimized assuming no differential games */
 
     /* 15624 */
-    case DASystem(v, ode) => true
+    case DASystem(child) => true
+    case DExists(v, ode) => true
 
     case Choice(a, b)    => dualFree(a) && dualFree(b)
     case Compose(a, b)   => dualFree(a) && dualFree(b)
@@ -480,7 +481,8 @@ final case class USubst(subsDefsInput: immutable.Seq[SubstitutionPair]) extends 
         *
         * Uniform substitution and admissibility rules for DASystem
         */
-      case DASystem(vars, child@(ODESystem(ode, h))) =>
+      case DASystem(child) => DASystem(usubst(child).asInstanceOf[DExists])
+      case DExists(vars, child@(ODESystem(ode, h))) =>
         //@note similar to forall/exists cases, the substitution should be vars-admissible for the child ode.
         //@note also need to check substitution admissibility for the child ode.
         requireAdmissible(SetLattice(vars), child, program)
@@ -489,7 +491,7 @@ final case class USubst(subsDefsInput: immutable.Seq[SubstitutionPair]) extends 
         //@note not actually used in the logic.
         requireAdmissible(StaticSemantics(ode).bv, h, child)
         */
-        DASystem(vars, usubst(child).asInstanceOf[ODESystem])
+        DExists(vars, usubst(child).asInstanceOf[ODESystem])
 
       case Choice(a, b)      => Choice(usubst(a), usubst(b))
       case Compose(a, b)     => requireAdmissible(StaticSemantics(usubst(a)).bv, b, program)

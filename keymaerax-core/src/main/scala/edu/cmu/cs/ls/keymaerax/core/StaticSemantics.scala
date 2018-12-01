@@ -243,7 +243,8 @@ object StaticSemantics {
         VCP(fv = va.fv ++ vb.fv, bv = va.bv ++ vb.bv, mbv = va.mbv ++ vb.mbv)
 
       /** 15624: DASystem */
-      case DASystem(xs, ode) => val va = progVars(ode); VCP(fv = va.fv -- xs, bv = va.bv, mbv = va.mbv)
+      case DASystem(child@DExists(xs, _)) => val va = progVars(child); VCP(fv = va.fv ++ xs, bv = va.bv -- xs, mbv = va.mbv -- xs)
+      case DExists(xs, ode) => val va = progVars(ode); VCP(fv = va.fv -- xs, bv = va.bv ++ xs, mbv = va.mbv ++ xs)
     }
   } ensuring(r => {
     val VCP(_, bv, mbv) = r; mbv.subsetOf(bv)
@@ -355,7 +356,8 @@ object StaticSemantics {
     case DifferentialProduct(a, b) => signature(a) ++ signature(b)
 
     /** 15624: Signature for DASystem */
-    case DASystem(xs, ode) => signature(ode)
+    case DASystem(child)  => signature(child)
+    case DExists(xs, ode) => signature(ode)
   }
 
   /**

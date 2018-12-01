@@ -167,7 +167,8 @@ final case class MultiRename(rens: immutable.Seq[(Variable,Variable)]) extends (
     case ODESystem(a, h)             => ODESystem(renameODE(a), rename(h))
 
     /** 15624 */
-    case DASystem(vars, child)       => DASystem(vars.map(x => renameVar(x, program)), rename(child).asInstanceOf[ODESystem])
+    case DASystem(child)             => DASystem(rename(child).asInstanceOf[DExists])
+    case DExists(vars, child)        => DExists(vars.map(x => renameVar(x, program)), rename(child).asInstanceOf[ODESystem])
 
     //@note This case happens for standalone uniform substitutions on differential programs such as x'=f() or c as they come up in unification for example.
     case ode: DifferentialProgram    => renameODE(ode)

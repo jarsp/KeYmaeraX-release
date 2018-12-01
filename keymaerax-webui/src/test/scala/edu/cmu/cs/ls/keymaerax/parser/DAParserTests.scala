@@ -31,7 +31,7 @@ class DAParserTests extends FlatSpec with Matchers with BeforeAndAfterEach {
 
     val parsed = parser(input)
 
-    parsed shouldBe DASystem(Seq(y), ODESystem(AtomicODE(DifferentialSymbol(x), y), GreaterEqual(y, Number(5))))
+    parsed shouldBe DASystem(DExists(Seq(y), ODESystem(AtomicODE(DifferentialSymbol(x), y), GreaterEqual(y, Number(5)))))
   }
 
   it should "parse DASystem with more than one quantified variable" in {
@@ -44,9 +44,9 @@ class DAParserTests extends FlatSpec with Matchers with BeforeAndAfterEach {
 
     val parsed = parser(input)
 
-    parsed shouldBe DASystem(Seq(y, z, c), ODESystem(AtomicODE(DifferentialSymbol(x), Plus(y, z)),
+    parsed shouldBe DASystem(DExists(Seq(y, z, c), ODESystem(AtomicODE(DifferentialSymbol(x), Plus(y, z)),
       And(LessEqual(Number(3), y), And(LessEqual(y, Number(4)),
-        And(LessEqual(Minus(x, c), z), LessEqual(z, Plus(x, c)))))))
+        And(LessEqual(Minus(x, c), z), LessEqual(z, Plus(x, c))))))))
   }
 
   it should "parse DASystem with more than one differential equation (diff product)" in {
@@ -61,8 +61,8 @@ class DAParserTests extends FlatSpec with Matchers with BeforeAndAfterEach {
 
     val parsed = parser(input)
 
-    parsed shouldBe DASystem(Seq(c, d, u, l), ODESystem(DifferentialProduct(AtomicODE(DifferentialSymbol(x), c),
-      AtomicODE(DifferentialSymbol(y), Plus(x, d))), And(LessEqual(c, Plus(x, u)), GreaterEqual(d, Minus(y, l)))))
+    parsed shouldBe DASystem(DExists(Seq(c, d, u, l), ODESystem(DifferentialProduct(AtomicODE(DifferentialSymbol(x), c),
+      AtomicODE(DifferentialSymbol(y), Plus(x, d))), And(LessEqual(c, Plus(x, u)), GreaterEqual(d, Minus(y, l))))))
   }
 
   it should "parse DASystem with no quantified variables?" in {
@@ -70,7 +70,7 @@ class DAParserTests extends FlatSpec with Matchers with BeforeAndAfterEach {
 
     val parsed = parser(input)
 
-    parsed shouldBe DASystem(Seq(), ODESystem(AtomicODE(DifferentialSymbol(Variable("x")), Variable("c"))))
+    parsed shouldBe DASystem(DExists(Seq(), ODESystem(AtomicODE(DifferentialSymbol(Variable("x")), Variable("c")))))
   }
 
   it should "parse DASystem in box" in {
@@ -81,8 +81,8 @@ class DAParserTests extends FlatSpec with Matchers with BeforeAndAfterEach {
 
     val parsed = parser(input)
 
-    parsed shouldBe Box(DASystem(Seq(y), ODESystem(AtomicODE(DifferentialSymbol(x), Plus(y, x)),
-      LessEqual(y, Times(Number(0.2), x)))), GreaterEqual(x, Number(5)))
+    parsed shouldBe Box(DASystem(DExists(Seq(y), ODESystem(AtomicODE(DifferentialSymbol(x), Plus(y, x)),
+      LessEqual(y, Times(Number(0.2), x))))), GreaterEqual(x, Number(5)))
   }
 
   it should "parse loopy DAsystem" in {
@@ -95,7 +95,7 @@ class DAParserTests extends FlatSpec with Matchers with BeforeAndAfterEach {
     val parsed = parser(input)
 
     parsed shouldBe Box(Loop(Compose(Assign(c, Plus(c, Number(1))),
-      DASystem(Seq(y), ODESystem(AtomicODE(DifferentialSymbol(x), y), LessEqual(y, Times(Number(0.2), x)))))),
+      DASystem(DExists(Seq(y), ODESystem(AtomicODE(DifferentialSymbol(x), y), LessEqual(y, Times(Number(0.2), x))))))),
       Equal(x, Number(0)))
   }
 
@@ -121,11 +121,13 @@ class DAParserTests extends FlatSpec with Matchers with BeforeAndAfterEach {
   }
   */
 
+  /*
   it should "refuse differential of quantified variables in ode" in {
     assertThrows[Exception] {
       parser("\\dexists {y} {x'=y, y'=1 & y<=5}")
     }
   }
+  */
 
   it should "refuse bad syntax" in {
     assertThrows[ParseException] {

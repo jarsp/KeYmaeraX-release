@@ -595,7 +595,7 @@ case class DifferentialFormula(child: Formula) extends UnaryCompositeFormula { d
   *     - `{a}^d` dual game as [[Dual]]([[Program]]])
   *   - Special
   *     - `{c&Q}` differential equation system as [[ODESystem]]([[DifferentialProgram]], [[Formula]])
-  *     - 15624: `\dexists {v1 v2 v3} {c&Q}` as [[DASystem]]([[Variable]](s), ODESystem)
+  *     - 15624: `\dexists {v1 v2 v3} {c&Q}` as [[DASystem]]([[DExists]]([[Variable]](s), ODESystem))
   * @author Andre Platzer
   * @see [[edu.cmu.cs.ls.keymaerax.parser.KeYmaeraXParser#programParser]]
   */
@@ -675,7 +675,8 @@ case class ODESystem(ode: DifferentialProgram, constraint: Formula = True) exten
 }
 
 /** 15624: DASystem */
-case class DASystem(vars: immutable.Seq[Variable], child: ODESystem) extends Program
+case class DASystem(child: DExists) extends Program
+case class DExists(vars: immutable.Seq[Variable], child:ODESystem) extends Program
 
 /**
   * Differential programs of differential dynamic logic.

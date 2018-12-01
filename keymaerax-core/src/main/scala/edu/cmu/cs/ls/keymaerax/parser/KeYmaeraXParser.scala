@@ -654,7 +654,7 @@ object KeYmaeraXParser extends Parser with TokenParser with Logging {
 
       case r :+ Token(DEXISTS, _) :+ RecognizedDAVarList(xs) :+ Expr(odesys:ODESystem) =>
         //println("Parsed odesys!")
-        reduce(st, 3, DASystem(xs, odesys), r)
+        reduce(st, 3, DASystem(DExists(xs, odesys)), r)
 
       case r :+ (tok1@Token(DEXISTS, _)) :+ (vl:RecognizedDAVarList) :+ Expr(ode:DifferentialProgram) if followsProgram(la) && la != AMP && la != COMMA =>
         //println("Parsed ode dp!")

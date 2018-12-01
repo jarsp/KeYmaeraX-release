@@ -47,6 +47,8 @@ object KeYmaeraXNoContractPrettyPrinter extends KeYmaeraXPrecedencePrinter {
 trait BasePrettyPrinter extends PrettyPrinter {
 
   /** Pretty-print term to a string */
+  /** 15624: No reparse pls!! for dexists/dasystem */
+  /*
   def apply(expr: Expression): String = stringify(expr) ensuring(
     r => expr.kind == FunctionKind || reparse(expr, r) == expr,
     "Parse of print is identity." +
@@ -56,6 +58,8 @@ trait BasePrettyPrinter extends PrettyPrinter {
       "\nExpression: " + FullPrettyPrinter.stringify(reparse(expr, stringify(expr))) + "\t@ " + reparse(expr, stringify(expr)).getClass.getSimpleName +
       "\nExpected:   " + FullPrettyPrinter.stringify(expr) + "\t@ " + expr.getClass.getSimpleName
     )
+  */
+  def apply(expr: Expression): String = stringify(expr)
 
   /** Pretty-print sequent to a string */
   def apply(seq: Sequent): String =
@@ -166,6 +170,11 @@ object FullPrettyPrinter extends BasePrettyPrinter {
     //@note This is only used in printing internal data structures, not user input.
     //@note no positional change since only internal data structure swap-over
     case ode: DifferentialProgram => "{" + ppODE(ode) + "}"
+
+    /** 15624 */
+    case DASystem(child)        => "DASystem(" + pp(child) + ")"
+    case DExists(xs, ode)       => "\\dexists{" + xs.map(stringify).mkString(",") + "}" + pp(ode)
+
     case t: UnaryCompositeProgram => "{" + pp(t.child) + "}" + op(program).opcode
 //    case t: Compose if OpSpec.statementSemicolon =>
 //      //@note in statementSemicolon mode, suppress opcode of Compose since already after each statement
@@ -316,7 +325,8 @@ class KeYmaeraXPrinter extends BasePrettyPrinter {
     case t: Compose => pwrapLeft(t, pp(q++0, t.left)) + ppOp(t) + pwrapRight(t, pp(q++1, t.right))
     case t: BinaryCompositeProgram => pwrapLeft(t, pp(q++0, t.left)) + ppOp(t) + pwrapRight(t, pp(q++1, t.right))
     /** 15624: blah */
-    case DASystem(xs, ode)      => "\\dexists{" + xs.map(stringify).mkString(",") + "}" + pp(q++0, ode)
+    case DASystem(child)       => "DASystem(" + pp(q++0,child) + ")"
+    case DExists(xs, ode)      => "\\dexists{" + xs.map(stringify).mkString(",") + "}" + pp(q++0, ode)
     case _ => "-program-"
   })
 

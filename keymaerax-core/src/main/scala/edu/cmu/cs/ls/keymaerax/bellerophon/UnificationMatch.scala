@@ -359,9 +359,10 @@ abstract class SchematicUnificationMatch extends BaseMatcher {
     case Dual(a)                     => e2 match {case Dual(a2)         => unify(a,a2) case _ => ununifiable(e1,e2)}
 
     /** 15624: Unification for DASystems */
-    case DASystem(v, ode) if v.length == 1 =>
+    case DASystem(child)             => e2 match {case DASystem(child2) => unify(child, child2) case _ => ununifiable(e1, e2)}
+    case DExists(v, ode) if v.length == 1 =>
       e2 match {
-        case DASystem(v2, ode2) if v2.length == 1 => unifies(v.head, ode, v2.head, ode2)
+        case DExists(v2, ode2) if v2.length == 1 => unifies(v.head, ode, v2.head, ode2)
         case _ => ununifiable(e1,e2)
       }
   }
