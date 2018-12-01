@@ -10,9 +10,10 @@ import edu.cmu.cs.ls.keymaerax.btactics.TactixLibrary._
 import edu.cmu.cs.ls.keymaerax.core._
 import edu.cmu.cs.ls.keymaerax.parser.StringConverter._
 import edu.cmu.cs.ls.keymaerax.tags.AdvocatusTest
-import edu.cmu.cs.ls.keymaerax.btactics.ProofRuleTactics.{closeTrue, cut, cutLR}
+import edu.cmu.cs.ls.keymaerax.btactics.ProofRuleTactics.{closeTrue, cut, cutLR, boundRenaming}
 import edu.cmu.cs.ls.keymaerax.btactics.PropositionalTactics._
 import edu.cmu.cs.ls.keymaerax.btactics.FOQuantifierTactics._
+import edu.cmu.cs.ls.keymaerax.pt._
 
 import scala.collection.immutable.Nil
 
@@ -27,20 +28,54 @@ class DAProvableTest extends TacticTestBase {
 
   }
 
-  it should "DAW test" in {
+  it should "prove by DAW axiom" in {
 
     val fml = "\\forall x [\\dexists {x} {y'=x & y>=0}]y>=0".asFormula
     val pr = proveBy(fml, useAt("DAW base", PosInExpr(Nil))(1))
 
   }
 
-  it should "DAI test" in {
+  it should "prove by DAI axiom" in {
 
-    val fml = "([\\dexists {x} {y'=x}](x+y>=z) <-> \\forall x [?true;]y>=z) <- (\\forall x [{y'=x}]((y>=z)'))".asFormula
-    //val pr = proveBy(fml, useAt("DAI differential invariance", PosInExpr(Nil))(1))
-    val pr = proveBy(fml, allInstantiateInverse(("q".asTerm, Variable("x")))(1, Nil))
-    //val pr = proveBy(fml, replaceFree(Variable("x"), Variable("q"))(1, 1::0::0::0::Nil)) //useAt("DAI differential invariance", PosInExpr(Nil))(1))
-    println(pr)
+    val fml = "([\\dexists {x} {y'=x}](y>=z) <-> \\forall x [?true;]y>=z) <- (\\forall x [{y'=x}]((y>=z)'))".asFormula
+    val pr = proveBy(fml, useAt("DAI differential invariance", PosInExpr(Nil))(1))
+
+  }
+
+  it should "substitute only quantified variables in DASystem" in {
+
+    val x = Variable("x")
+    val y = Variable("y")
+    val z = Variable("z")
+    val q = Variable("q")
+
+    val fml = "([\\dexists {x} {y'=x}](y>=z) <-> \\forall x [?true;]y>=z) <- (\\forall x [{y'=x}]((y>=z)'))".asFormula
+    val pr = proveBy(fml, boundRenaming(x, q)(1, 1::0::Nil))
+
+    pr.isInstanceOf[ElidingProvable] should be (true)
+
+    val Sequent(ante, succ) = pr.conclusion
+
+    ante.length should be (0)
+    succ.length should be (1)
+
+    succ.head should be (Imply(
+        Forall(x::Nil, Box(ODESystem(AtomicODE(DifferentialSymbol(y), x), True),
+          DifferentialFormula(GreaterEqual(y, z)))),
+        Equiv(Box(DASystem(DExists(x::Nil, ODESystem(AtomicODE(DifferentialSymbol(y), x), True))), GreaterEqual(y, z)),
+          Forall(x::Nil, Box(Test(True), GreaterEqual(y, z))))))
+
+    pr.subgoals.length should be (1)
+
+    val goal1 = pr.subgoals.head
+    goal1.ante.length should be (0)
+    goal1.succ.length should be (1)
+
+    goal1.succ.head should be (Imply(
+      Forall(x::Nil, Box(ODESystem(AtomicODE(DifferentialSymbol(y), x), True),
+        DifferentialFormula(GreaterEqual(y, z)))),
+      Equiv(Box(DASystem(DExists(q::Nil, ODESystem(AtomicODE(DifferentialSymbol(y), q), True))), GreaterEqual(y, z)),
+        Forall(x::Nil, Box(Test(True), GreaterEqual(y, z))))))
 
   }
 
