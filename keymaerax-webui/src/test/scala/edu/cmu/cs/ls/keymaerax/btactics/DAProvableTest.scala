@@ -19,6 +19,7 @@ import scala.collection.immutable.Nil
 @AdvocatusTest
 class DAProvableTest extends TacticTestBase {
 
+  /*
   it should "prove vacuous" in {
 
     val fml = "y=1 -> [\\dexists {z} {x'=z}] y=1".asFormula
@@ -26,12 +27,19 @@ class DAProvableTest extends TacticTestBase {
 
   }
 
-
-  it should "test" in {
+  it should "DAW test" in {
 
     val fml = "\\forall x [\\dexists {x} {y'=x & y>=0}]y>=0".asFormula
     val pr = proveBy(fml, useAt("DAW base", PosInExpr(Nil))(1))
 
+  }
+  */
+
+  it should "DAI test" in {
+
+    val fml = "([\\dexists {x} {y'=x}](x+y>=z) <-> \\forall x [?true;]y>=z) <- (\\forall x [{y'=x}]((y>=z)'))".asFormula
+    val pr = proveBy(fml, boundRename(Variable("x"), Variable("q"))(1, 1::1::Nil)) //useAt("DAI differential invariance", PosInExpr(Nil))(1))
+    println(pr)
   }
 
 }

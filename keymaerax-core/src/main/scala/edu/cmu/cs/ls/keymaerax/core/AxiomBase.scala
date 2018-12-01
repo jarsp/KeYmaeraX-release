@@ -306,6 +306,10 @@ Axiom "DAW base".
   \forall x [\dexists{x}{c&q(||)}]q(||)
 End.
 
+Axiom "DAI differential invariance".
+  ([\dexists{x}{c&q(||)}]p(|x|) <-> \forall x [?q(||);]p(|x|)) <- (\forall x [{c&q(||)}](p(|x|)'))
+End.
+
 
 Axiom "DW base".
   [{c&q(||)}]q(||)

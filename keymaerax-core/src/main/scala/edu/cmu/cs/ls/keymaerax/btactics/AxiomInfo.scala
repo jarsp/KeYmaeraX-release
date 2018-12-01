@@ -179,7 +179,9 @@ object DerivationInfo {
     // differential equation axioms
 
     /** 15624 */
-    new CoreAxiomInfo("DAW base", "DAWbase", "DAWbase", {case () => HilbertCalculus.DW}),
+    // TODO: change!!
+    new CoreAxiomInfo("DAW base", "DAWbase", "DAWbase", {case () => ???}),
+    new CoreAxiomInfo("DAI differential invariance", "DAIequiv", "DAIequiv", {case () => ???}),
 
     new CoreAxiomInfo("DW base", "DWbase", "DWbase", {case () => HilbertCalculus.DW}),
     new PositionTacticInfo("dW"

@@ -53,6 +53,7 @@ object AxiomIndex extends Logging {
 
     /** 15624 */
     case "DAW base"            => (PosInExpr(Nil), Nil)
+    case "DAI differential invariance" => (PosInExpr(1::0::Nil), PosInExpr(Nil)::Nil)
 
     case "DW base"              => (PosInExpr(Nil), Nil)
     case "DC differential cut" => (PosInExpr(1::0::Nil), PosInExpr(Nil)::Nil)
