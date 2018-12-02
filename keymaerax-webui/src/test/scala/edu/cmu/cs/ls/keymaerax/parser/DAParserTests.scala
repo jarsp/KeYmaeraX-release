@@ -121,13 +121,11 @@ class DAParserTests extends FlatSpec with Matchers with BeforeAndAfterEach {
   }
   */
 
-  /*
   it should "refuse differential of quantified variables in ode" in {
     assertThrows[Exception] {
       parser("\\dexists {y} {x'=y, y'=1 & y<=5}")
     }
   }
-  */
 
   it should "refuse bad syntax" in {
     assertThrows[ParseException] {

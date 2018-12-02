@@ -676,7 +676,14 @@ case class ODESystem(ode: DifferentialProgram, constraint: Formula = True) exten
 
 /** 15624: DASystem */
 case class DASystem(child: DExists) extends Program
-case class DExists(vars: immutable.Seq[Variable], child:ODESystem) extends Program
+case class DExists(vars: immutable.Seq[Variable], child:ODESystem) extends Program {
+  insist(StaticSemantics.symbols(child)
+                        .filter(x=>x.isInstanceOf[DifferentialSymbol])
+                        .map({ case DifferentialSymbol(x) => x })
+                        .intersect(vars.toSet)
+                        .isEmpty,
+         "No differentials of differentially quantified variables: " + this + "")
+}
 
 /**
   * Differential programs of differential dynamic logic.
