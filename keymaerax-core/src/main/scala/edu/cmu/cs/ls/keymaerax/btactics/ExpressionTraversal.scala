@@ -254,6 +254,10 @@ object ExpressionTraversal {
         case DifferentialProduct(a, b) => matchTwo(p, DifferentialProduct.apply, f, a, b)
         case ODESystem(a, h) => matchTwo(p, ODESystem(_: DifferentialProgram, _: Formula), f, a, h)
 
+        /** 15624 */
+        case DASystem(a) => matchOne(p, DASystem(_: DExists), f, a)
+        case DExists(v, o) => matchOne(p, DExists(v, _: ODESystem), f, o)
+
         case _ => failFTPG(e)
       }) match {
         case Some(y) => Some(y.asInstanceOf[A])

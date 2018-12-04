@@ -14,6 +14,7 @@ import edu.cmu.cs.ls.keymaerax.btactics.ProofRuleTactics.{closeTrue, cut, cutLR,
 import edu.cmu.cs.ls.keymaerax.btactics.PropositionalTactics._
 import edu.cmu.cs.ls.keymaerax.btactics.FOQuantifierTactics._
 import edu.cmu.cs.ls.keymaerax.pt._
+import edu.cmu.cs.ls.keymaerax.btactics.DifferentialTactics._
 
 import scala.collection.immutable.Nil
 
@@ -91,6 +92,36 @@ class DAProvableTest extends TacticTestBase {
         DifferentialFormula(GreaterEqual(y, z)))),
       Equiv(Box(DASystem(DExists(q::Nil, ODESystem(AtomicODE(DifferentialSymbol(y), q), True))), GreaterEqual(y, z)),
         Forall(x::Nil, Box(Test(True), GreaterEqual(y, z))))))
+
+  }
+
+  it should "apply tactic" in {
+
+    val fml = "[{y'=x & y>=2}]y>=0".asFormula
+    val pr = proveBy(fml, diffWeaken(1))
+
+    println(pr)
+  }
+
+
+  it should "apply DAWeaken tactic" in {
+
+    val fml = "[\\dexists {x} {y'=x & y>=2}]y>=0".asFormula
+    val pr = proveBy(fml, DAWeaken(1))
+
+    println(pr)
+
+    val y = Variable("y")
+    pr.isInstanceOf[ElidingProvable] should be (true)
+
+    val Sequent(ante, succ) = pr.conclusion
+
+    val goal1 = pr.subgoals.head
+    goal1.ante.length should be (1)
+    goal1.succ.length should be (1)
+
+    goal1.ante.head should be (GreaterEqual(y, Number(2)))
+    goal1.succ.head should be (GreaterEqual(y, Number(0)))
 
   }
 

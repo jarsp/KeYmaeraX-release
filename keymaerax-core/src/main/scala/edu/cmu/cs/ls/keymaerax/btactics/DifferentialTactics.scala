@@ -175,6 +175,22 @@ private object DifferentialTactics extends Logging {
     }
   }
 
+  /** 15624 */
+  /**
+    * DAWeaken: Differential weakening for DASystems
+     */
+  lazy val DAWeaken: DependentPositionTactic = "dAW" by ((pos: Position, sequent: Sequent) => sequent.sub(pos) match {
+    case Some(Box(DASystem(DExists(vars, ode)), p)) =>
+      require(pos.isTopLevel && pos.isSucc, "DAWeaken only at top level in succedent")
+
+      if (sequent.succ.size <= 1) {
+        DAS(1) & allR(1) & G(1) & dW(1) & implyR(1)
+      } else {
+        ???
+      }
+  })
+  /** 15624 */
+
   /**
    * diffInd: Differential Invariant proves a formula to be an invariant of a differential equation (by DI, DW, DE, QE)
     *
