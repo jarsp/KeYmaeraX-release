@@ -180,7 +180,7 @@ object DerivationInfo {
 
     /** 15624 */
     // TODO: change!!
-    new CoreAxiomInfo("DAW base", "DAWbase", "DAWbase", {case () => ???}),
+    new CoreAxiomInfo("DAS differential stutter", "DAS", "DAS", {case () => ???}),
     new CoreAxiomInfo("DAI differential invariance", "DAIequiv", "DAIequiv", {case () => ???}),
 
     new CoreAxiomInfo("DW base", "DWbase", "DWbase", {case () => HilbertCalculus.DW}),

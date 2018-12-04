@@ -28,17 +28,32 @@ class DAProvableTest extends TacticTestBase {
 
   }
 
-  it should "prove by DAW axiom" in {
+  it should "prove by DAI axiom" in {
 
-    val fml = "\\forall x [\\dexists {x} {y'=x & y>=0}]y>=0".asFormula
-    val pr = proveBy(fml, useAt("DAW base", PosInExpr(Nil))(1))
+    // val fml = "([\\dexists {x} {y'=x}](y>=z) <-> \\forall x [?true;]y>=z) <- (\\forall x [{y'=x}]((y>=z)'))".asFormula
+    val fml = "([\\dexists {x} {y'=x}](y>=z) <-> \\forall x [?true;]y>=z) <- ([\\dexists {x} {y'=x}]((y>=z)'))".asFormula
+    val pr = proveBy(fml, useAt("DAI differential invariance", PosInExpr(Nil))(1))
 
   }
 
-  it should "prove by DAI axiom" in {
+  it should "refuse DAI axiom when quantified variables appear in postcondition" in {
 
-    val fml = "([\\dexists {x} {y'=x}](y>=z) <-> \\forall x [?true;]y>=z) <- (\\forall x [{y'=x}]((y>=z)'))".asFormula
-    val pr = proveBy(fml, useAt("DAI differential invariance", PosInExpr(Nil))(1))
+    val fml = "([\\dexists {x} {y'=x}](y>=x) <-> \\forall x [?true;](y>=x)) <- [\\dexists {x} {y'=x}]((y>=x)')".asFormula
+    a [Exception] should be thrownBy(proveBy(fml, useAt("DAI differential invariance", PosInExpr(Nil))(1)))
+
+  }
+
+  it should "match DAS" in {
+
+    val fml = "[\\dexists {x} {y'=x&x>=2*y}](y>=z) <-> \\forall x [\\dexists {x} {y'=x&x>=2*y}][{y'=x&x>=2*y}](y>=z)".asFormula
+    val pr = proveBy(fml, useAt("DAS differential stutter", PosInExpr(Nil))(1))
+
+  }
+
+  it should "refuse DAS when quantified variables appear in postcondition" in {
+
+    val fml = "[\\dexists {x} {y'=x&x>=2*y}](y>=x) <-> \\forall x [\\dexists {x} {y'=x&x>=2*y}][{y'=x&x>=2*y}](y>=x)".asFormula
+    a [Exception] should be thrownBy(proveBy(fml, useAt("DAS differential stutter", PosInExpr(Nil))(1)))
 
   }
 

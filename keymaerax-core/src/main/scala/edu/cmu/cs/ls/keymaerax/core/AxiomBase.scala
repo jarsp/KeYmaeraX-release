@@ -302,12 +302,12 @@ Axiom "[*] iterate".
 End.
 
 /** 15624 */
-Axiom "DAW base".
-  \forall x [\dexists{x}{c&q(||)}]q(||)
+Axiom "DAS differential stutter".
+  [\dexists{x}{c&q(||)}]p(|x|) <-> \forall x [\dexists{x}{c&q(||)}][{c&q(||)}]p(|x|)
 End.
 
 Axiom "DAI differential invariance".
-  ([\dexists{x}{c&q(||)}]p(|x|) <-> \forall x [?q(||);]p(|x|)) <- (\forall x [{c&q(||)}](p(|x|)'))
+  ([\dexists{x}{c&q(||)}]p(|x|) <-> \forall x [?q(||);]p(|x|)) <- [\dexists{x}{c&q(||)}](p(|x|)')
 End.
 /** 15624 */
 

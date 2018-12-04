@@ -79,4 +79,5 @@ class DAUSubstTests extends SystemTestBase {
 
     a [SubstitutionClashException] should be thrownBy(s(p))
   }
+
 }
