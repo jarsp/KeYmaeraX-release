@@ -52,8 +52,9 @@ object AxiomIndex extends Logging {
     case "&true inv" => (PosInExpr(0::Nil), PosInExpr(Nil)::Nil)
 
     /** 15624 */
-    case "DAS differential stutter" => (PosInExpr(0::Nil), PosInExpr(1::Nil)::Nil)
-    case "DAI differential invariance" => (PosInExpr(1::0::Nil), PosInExpr(Nil)::Nil)
+    case "DAS differential stutter" => (PosInExpr(0::Nil), Nil)
+    case "DAI differential invariance" => (PosInExpr(1::0::Nil), Nil)
+    case "DAI differential invariant" => (PosInExpr(1::Nil), Nil)
 
     case "DW base"              => (PosInExpr(Nil), Nil)
     case "DC differential cut" => (PosInExpr(1::0::Nil), PosInExpr(Nil)::Nil)

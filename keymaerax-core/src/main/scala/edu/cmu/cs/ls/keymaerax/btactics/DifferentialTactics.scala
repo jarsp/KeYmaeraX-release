@@ -193,18 +193,19 @@ private object DifferentialTactics extends Logging {
       // 'Rlast: Last position in succedent (right side)
       // abstractionb is GV
 
+      // 15624 TODO: Check safety and how to make more robust
       DAS(pos) & allR(pos) & abstractionb(pos) & allR(pos) & dW(pos) & implyR(pos)
   })
 
-  /*
   lazy val DAInvariant: DependentPositionTactic =
-    "dAI" by ((pos, sequent) => sequent.at(pos) match {
-      //@note like diffInvariant, assumes first subgoal is desired result
-      //DAI(1)
+    "dAI" by ((pos: Position, sequent: Sequent) => sequent.at(pos) match {
       case (ctx, Box(da@DASystem(DExists(vars, ode)), p)) =>
-        cut(Imply())
+        useAt("DAI differential invariant")(pos) & andR(pos) <(
+          allR('Rlast) & implyR('Rlast),
+          HilbertCalculus.derive('Rlast, PosInExpr(1::Nil)) & DAS('Rlast) & allR('Rlast) &
+            G('Rlast) & DE('Rlast) & DW('Rlast) & G('Rlast) & implyR('Rlast)
+        )
   })
-  */
   /** 15624 */
 
   /**

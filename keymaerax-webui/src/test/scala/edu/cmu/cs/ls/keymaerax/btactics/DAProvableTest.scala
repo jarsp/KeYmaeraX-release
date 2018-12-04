@@ -154,6 +154,14 @@ class DAProvableTest extends TacticTestBase {
     println(pr)
   }
 
+  it should "DAI tactic" in {
+    val fml = "(v^2 <= 2*(b-u)*(m-z) & b>u & u>=0 & l>=0) -> [\\dexists{c}{z' = v, v' = a - l + c & c >= 0 & v >= 0}](z <= m)".asFormula
+    val pr = proveBy(fml,
+      implyR(1) & DAInvariant(1)
+    )
+
+    println(pr)
+  }
 
 
 }
