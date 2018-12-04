@@ -172,7 +172,7 @@ object FullPrettyPrinter extends BasePrettyPrinter {
     case ode: DifferentialProgram => "{" + ppODE(ode) + "}"
 
     /** 15624 */
-    case DASystem(child)        => "DASystem(" + pp(child) + ")"
+    case DASystem(child)        => pp(child)
     case DExists(xs, ode)       => "\\dexists{" + xs.map(stringify).mkString(",") + "}" + pp(ode)
 
     case t: UnaryCompositeProgram => "{" + pp(t.child) + "}" + op(program).opcode

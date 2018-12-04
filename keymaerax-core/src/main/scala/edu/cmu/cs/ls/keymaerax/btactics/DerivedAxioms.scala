@@ -7,6 +7,7 @@ package edu.cmu.cs.ls.keymaerax.btactics
 import edu.cmu.cs.ls.keymaerax.bellerophon.{BelleExpr, OnAll, PosInExpr, RenUSubst}
 import edu.cmu.cs.ls.keymaerax.btactics.TactixLibrary._
 import edu.cmu.cs.ls.keymaerax.btactics.FOQuantifierTactics.allInstantiateInverse
+import edu.cmu.cs.ls.keymaerax.btactics.ProofRuleTactics.cut
 import edu.cmu.cs.ls.keymaerax.core._
 import edu.cmu.cs.ls.keymaerax.lemma.LemmaDBFactory
 import edu.cmu.cs.ls.keymaerax.parser.StringConverter._
@@ -1970,6 +1971,17 @@ object DerivedAxioms extends Logging {
         ,
         cohide(2) & by(DIinvariance)
         )
+  )
+
+  /** 15624 */
+  lazy val DAIinvariant = derivedAxiom("DAI differential invariant",
+    Sequent(IndexedSeq(), IndexedSeq("([\\dexists{x}{c&q(||)}]p(|x|)) <- ((\\forall x (q(||) -> p(|x|))) & [\\dexists{x}{c&q(||)}]((p(|x|))'))".asFormula)),
+    implyR(1) & andL(-1) & useAt("[?] test", PosInExpr(1::Nil))(-1, PosInExpr(0::Nil)) &
+      cut("([\\dexists{x}{c&q(||)}]p(|x|) <-> \\forall x [?q(||);]p(|x|)) <- [\\dexists{x}{c&q(||)}](p(|x|)')".asFormula)
+        <(
+        prop & onAll(close),
+        cohide(2) & useAt("DAI differential invariance", PosInExpr(Nil))(1, PosInExpr(Nil))
+      )
   )
 
   /**

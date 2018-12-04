@@ -5,21 +5,24 @@
 
 package edu.cmu.cs.ls.keymaerax.btactics
 
-import edu.cmu.cs.ls.keymaerax.bellerophon.PosInExpr
+import edu.cmu.cs.ls.keymaerax.bellerophon._
 import edu.cmu.cs.ls.keymaerax.btactics.TactixLibrary._
 import edu.cmu.cs.ls.keymaerax.core._
 import edu.cmu.cs.ls.keymaerax.parser.StringConverter._
-import edu.cmu.cs.ls.keymaerax.tags.AdvocatusTest
-import edu.cmu.cs.ls.keymaerax.btactics.ProofRuleTactics.{closeTrue, cut, cutLR, boundRenaming}
+import edu.cmu.cs.ls.keymaerax.tags.{AdvocatusTest, USubstTest}
+import edu.cmu.cs.ls.keymaerax.btactics.ProofRuleTactics.{boundRenaming, closeTrue, cut, cutLR}
 import edu.cmu.cs.ls.keymaerax.btactics.PropositionalTactics._
 import edu.cmu.cs.ls.keymaerax.btactics.FOQuantifierTactics._
 import edu.cmu.cs.ls.keymaerax.pt._
 import edu.cmu.cs.ls.keymaerax.btactics.DifferentialTactics._
+import edu.cmu.cs.ls.keymaerax.btactics.Idioms._
+import edu.cmu.cs.ls.keymaerax.btactics.DerivedAxioms._
 
 import scala.collection.immutable.Nil
 
 
 @AdvocatusTest
+@USubstTest
 class DAProvableTest extends TacticTestBase {
 
   it should "prove vacuous" in {
@@ -100,16 +103,16 @@ class DAProvableTest extends TacticTestBase {
     val fml = "[{y'=x & y>=2}]y>=0".asFormula
     val pr = proveBy(fml, diffWeaken(1))
 
-    println(pr)
+    //println(pr)
   }
 
 
   it should "apply DAWeaken tactic" in {
 
-    val fml = "[\\dexists {x} {y'=x & y>=2}]y>=0".asFormula
+    val fml = "x=5 ==> [\\dexists {x} {y'=x & y>=2}]y>=0".asSequent
     val pr = proveBy(fml, DAWeaken(1))
 
-    println(pr)
+    //println(pr)
 
     val y = Variable("y")
     pr.isInstanceOf[ElidingProvable] should be (true)
@@ -117,13 +120,41 @@ class DAProvableTest extends TacticTestBase {
     val Sequent(ante, succ) = pr.conclusion
 
     val goal1 = pr.subgoals.head
-    goal1.ante.length should be (1)
+    goal1.ante.length should be (2)
     goal1.succ.length should be (1)
 
-    goal1.ante.head should be (GreaterEqual(y, Number(2)))
+    //goal1.ante.head should be (GreaterEqual(y, Number(2)))
     goal1.succ.head should be (GreaterEqual(y, Number(0)))
 
   }
+
+
+  it should "apply DAWeaken in context?" in {
+    val fml = "false & [\\dexists {x} {y'=x & y>=2}]y>=0".asFormula
+    val pr = proveBy(fml, andR(1) & Idioms.<(
+      skip,
+      DAWeaken(1)
+    ))
+
+    //println(pr)
+  }
+
+  it should "apply DAWeaken in context2?" in {
+    val fml = "==> y >= 2, [\\dexists {x} {y'=x & y>=2}]y>=0".asSequent
+    val pr = proveBy(fml, DAWeaken(2))
+
+    println(pr)
+  }
+
+
+  it should "DAI" in {
+    val fml = "([\\dexists{x}{c&q(||)}]p(|x|)) <- ((\\forall x (q(||) -> p(|x|))) & [\\dexists{x}{c&q(||)}]((p(|x|))'))".asFormula
+    val pr = proveBy(fml, useAt(DAIinvariant, PosInExpr(Nil))(1, PosInExpr(Nil)))
+
+    println(pr)
+  }
+
+
 
 }
 

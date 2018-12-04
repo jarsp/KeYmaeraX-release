@@ -182,6 +182,7 @@ object DerivationInfo {
     // TODO: change!!
     new CoreAxiomInfo("DAS differential stutter", "DAS", "DAS", {case () => ???}),
     new CoreAxiomInfo("DAI differential invariance", "DAIequiv", "DAIequiv", {case () => ???}),
+    new DerivedAxiomInfo("DAI differential invariant", "DAI", "DAI", {case () => HilbertCalculus.DAI}),
 
     new CoreAxiomInfo("DW base", "DWbase", "DWbase", {case () => HilbertCalculus.DW}),
     new PositionTacticInfo("dW"

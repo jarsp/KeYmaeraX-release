@@ -178,17 +178,33 @@ private object DifferentialTactics extends Logging {
   /** 15624 */
   /**
     * DAWeaken: Differential weakening for DASystems
+    *
+    * @example{{{
+    *    y>=2 |- y>= 0
+    *    --------------------------------------------- DAWeaken(1)
+    *         |- [\dexists {x} {y'=x & y>=2}]y>=0
+    * }}}
      */
-  lazy val DAWeaken: DependentPositionTactic = "dAW" by ((pos: Position, sequent: Sequent) => sequent.sub(pos) match {
-    case Some(Box(DASystem(DExists(vars, ode)), p)) =>
+  lazy val DAWeaken: DependentPositionTactic = "dAW" by ((pos: Position, sequent: Sequent) => sequent.at(pos) match {
+    case (ctx, Box(DASystem(DExists(vars, ode)), p)) =>
       require(pos.isTopLevel && pos.isSucc, "DAWeaken only at top level in succedent")
 
-      if (sequent.succ.size <= 1) {
-        DAS(1) & allR(1) & G(1) & dW(1) & implyR(1)
-      } else {
-        ???
-      }
+      // currently use G, which potentially destroys too much (all) context?
+      // 'Rlast: Last position in succedent (right side)
+      // abstractionb is GV
+
+      DAS(pos) & allR(pos) & abstractionb(pos) & allR(pos) & dW(pos) & implyR(pos)
   })
+
+  /*
+  lazy val DAInvariant: DependentPositionTactic =
+    "dAI" by ((pos, sequent) => sequent.at(pos) match {
+      //@note like diffInvariant, assumes first subgoal is desired result
+      //DAI(1)
+      case (ctx, Box(da@DASystem(DExists(vars, ode)), p)) =>
+        cut(Imply())
+  })
+  */
   /** 15624 */
 
   /**

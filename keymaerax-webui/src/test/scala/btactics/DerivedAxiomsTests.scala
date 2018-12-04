@@ -158,6 +158,9 @@ class DerivedAxiomsTests extends edu.cmu.cs.ls.keymaerax.btactics.TacticTestBase
   it should "prove ->'" in {check(Dimply)}
   it should "prove \\forall->\\exists" in {check(forallThenExistsAxiom)}
   //it should "prove DI differential invariance from DI" in {check(DIinvariance)}
+  /** 15624 */
+  it should "prove DAI differential invariant from DAI" in {check(DAIinvariant)}
+
   it should "prove DI differential invariant from DI" in {check(DIinvariant)}
   it should "prove DIo open differential invariance <" in {check(DIOpeninvariantLess)}
   it should "prove DV differential variant <=" in withMathematica {qeTool => check(DVLessEqual)}
