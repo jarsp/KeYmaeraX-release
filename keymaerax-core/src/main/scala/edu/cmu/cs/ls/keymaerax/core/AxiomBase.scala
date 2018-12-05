@@ -310,9 +310,8 @@ Axiom "DAI differential invariance".
   ([\dexists{x}{c&q(||)}]p(|x|) <-> \forall x [?q(||);]p(|x|)) <- [\dexists{x}{c&q(||)}](p(|x|)')
 End.
 
-Axiom "DAC differential cut".
-  /* stronger: ([\dexists{x}{c&q(||)}]p(||) <-> [\dexists{x}{c&q(||)&r(|x|)}]p(||)) <- [\dexists{x}{c&q(||)}]r(|x|) */
-  ([\dexists{x}{c&q(||)}]p(||)) <- ([\dexists{x}{c&q(||)&r(|x|)}]p(||) & [\dexists{x}{c&q(||)}]r(|x|))
+Axiom "DACbase differential cut".
+  ([\dexists{x}{c&q(||)}]p(||) <-> [\dexists{x}{c&q(||)&r(|x|)}]p(||)) <- [\dexists{x}{c&q(||)}]r(|x|)
 End.
 /** 15624 */
 

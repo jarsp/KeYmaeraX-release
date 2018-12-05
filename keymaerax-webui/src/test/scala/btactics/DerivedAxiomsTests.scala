@@ -160,6 +160,7 @@ class DerivedAxiomsTests extends edu.cmu.cs.ls.keymaerax.btactics.TacticTestBase
   //it should "prove DI differential invariance from DI" in {check(DIinvariance)}
   /** 15624 */
   it should "prove DAI differential invariant from DAI" in {check(DAIinvariant)}
+  it should "prove DAC differential cut from DAC" in {check(DADiffCut)}
 
   it should "prove DI differential invariant from DI" in {check(DIinvariant)}
   it should "prove DIo open differential invariance <" in {check(DIOpeninvariantLess)}

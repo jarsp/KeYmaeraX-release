@@ -30,6 +30,8 @@ class DAProvableTest extends TacticTestBase {
     val fml = "y=1 -> [\\dexists {z} {x'=z}] y=1".asFormula
     val pr = proveBy(fml, implyR(1) & abstractionb(1) & closeId)
 
+    pr shouldBe 'proved
+
   }
 
   it should "prove by DAI axiom" in {
@@ -161,6 +163,26 @@ class DAProvableTest extends TacticTestBase {
     )
 
     ///println(pr)
+  }
+
+  it should "derive DAC diff cut" in {
+    val fml = "([\\dexists{x}{c&q(||)}]p(||)) <- ([\\dexists{x}{c&q(||)&r(|x|)}]p(||) & [\\dexists{x}{c&q(||)}]r(|x|))".asFormula
+    val pr = proveBy(fml,
+      implyR(1) & andL(-1) &
+      cut("([\\dexists{x}{c&q(||)}]p(||) <-> [\\dexists{x}{c&q(||)&r(|x|)}]p(||)) <- [\\dexists{x}{c&q(||)}]r(|x|)".asFormula)
+        <(
+          implyL('Llast) <(
+            closeId & done,
+            equivL('Llast) <(
+              andL('Llast) & closeId & done,
+              andL('Llast) & notL('Llast) & closeId & done
+            )
+          ),
+          cohideR('Rlast) & useAt("DACbase differential cut", PosInExpr(Nil))('Rlast)
+        )
+    )
+
+    println(pr)
   }
 
   it should "DAC differential cut easy" in withQE { _ =>

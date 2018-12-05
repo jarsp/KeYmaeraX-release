@@ -1984,6 +1984,23 @@ object DerivedAxioms extends Logging {
       )
   )
 
+  lazy val DADiffCut = derivedAxiom("DAC differential cut",
+    Sequent(IndexedSeq(), IndexedSeq("([\\dexists{x}{c&q(||)}]p(||)) <- ([\\dexists{x}{c&q(||)&r(|x|)}]p(||) & [\\dexists{x}{c&q(||)}]r(|x|))".asFormula)),
+    implyR(1) & andL(-1) &
+    cut("([\\dexists{x}{c&q(||)}]p(||) <-> [\\dexists{x}{c&q(||)&r(|x|)}]p(||)) <- [\\dexists{x}{c&q(||)}]r(|x|)".asFormula)
+      <(
+      implyL('Llast) <(
+        closeId & done,
+        equivL('Llast) <(
+          andL('Llast) & closeId & done,
+          andL('Llast) & notL('Llast) & closeId & done
+        )
+      ),
+      cohideR('Rlast) & useAt("DACbase differential cut", PosInExpr(Nil))('Rlast)
+    )
+  )
+  /** 15624 */
+
   /**
     * {{{Axiom "DIo open differential invariance <".
     *    ([{c&q(||)}]f(||)<g(||) <-> [?q(||);]f(||)<g(||)) <- (q(||) -> [{c&q(||)}](f(||)<g(||) -> (f(||)<g(||))'))

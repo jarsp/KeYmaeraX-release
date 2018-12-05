@@ -192,6 +192,7 @@ trait HilbertCalculus extends UnifyUSCalculus {
   /** 15624 */
   lazy val DAS                : DependentPositionTactic = useAt("DAS differential stutter")
   lazy val DAI                : DependentPositionTactic = useAt("DAI differential invariant")
+  lazy val DAC                : DependentPositionTactic = useAt("DAC differential cut")
 
   /** DW: Differential Weakening to use evolution domain constraint `[{x'=f(x)&q(x)}]p(x)` reduces to `[{x'=f(x)&q(x)}](q(x)->p(x))` */
   lazy val DW                 : DependentPositionTactic = useAt("DW differential weakening")
