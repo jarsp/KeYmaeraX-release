@@ -148,7 +148,6 @@ class DAProvableTest extends TacticTestBase {
     //println(pr)
   }
 
-
   it should "DAI" in {
     val fml = "([\\dexists{x}{c&q(||)}]p(|x|)) <- ((\\forall x (q(||) -> p(|x|))) & [\\dexists{x}{c&q(||)}]((p(|x|))'))".asFormula
     val pr = proveBy(fml, useAt(DAIinvariant, PosInExpr(Nil))(1, PosInExpr(Nil)))
@@ -157,29 +156,9 @@ class DAProvableTest extends TacticTestBase {
   }
 
   it should "DAI tactic" in {
-    val fml = "(v^2 <= 2*(b-u)*(m-z) & b>u & u>=0 & l>=0) -> [\\dexists{c}{z' = v, v' = a - l + c & c >= 0 & v >= 0}](z <= m)".asFormula
+    val fml = "(v^2 <= 2*(b-u)*(m-z) & b>u & u>=0 & l>=0) -> [\\dexists{c}{x' = v, v' = a - l + c & c >= 0 & v >= 0}](x <= m)".asFormula
     val pr = proveBy(fml,
       implyR(1) & DAInvariant(1)
-    )
-
-    ///println(pr)
-  }
-
-  it should "derive DAC diff cut" in {
-    val fml = "([\\dexists{x}{c&q(||)}]p(||)) <- ([\\dexists{x}{c&q(||)&r(|x|)}]p(||) & [\\dexists{x}{c&q(||)}]r(|x|))".asFormula
-    val pr = proveBy(fml,
-      implyR(1) & andL(-1) &
-      cut("([\\dexists{x}{c&q(||)}]p(||) <-> [\\dexists{x}{c&q(||)&r(|x|)}]p(||)) <- [\\dexists{x}{c&q(||)}]r(|x|)".asFormula)
-        <(
-          implyL('Llast) <(
-            closeId & done,
-            equivL('Llast) <(
-              andL('Llast) & closeId & done,
-              andL('Llast) & notL('Llast) & closeId & done
-            )
-          ),
-          cohideR('Rlast) & useAt("DACbase differential cut", PosInExpr(Nil))('Rlast)
-        )
     )
 
     println(pr)
@@ -201,12 +180,8 @@ class DAProvableTest extends TacticTestBase {
     pr.isProved shouldBe true
   }
 
-  /*
   it should "DAC differential cut easy with x" in  {
-
-    // this currently doesn't work, because the substitution x >= 0 is probably
-    // done before unifying the rest of the axiom, so the substitution is rejected because
-    // the axiom requires f(|x|)
+    // Used a hack rename to make it work
     val fml = "y >= 2 ==> [\\dexists{c}{y' = c & c >= 1}](y >= 0)".asSequent
     var pr = proveBy(fml,
       DACut("x >= 0".asFormula)(1)
@@ -214,7 +189,6 @@ class DAProvableTest extends TacticTestBase {
 
     println(pr)
   }
-  */
 
   it should "DAC differential cut" in {
     val fml = "(v^2 <= 2*(b-u)*(m-z) & b>u & u>=0 & l>=0) -> [\\dexists{c}{z' = v, v' = a - l + c & c >= 0 & v >= 0}](z <= m)".asFormula
@@ -224,6 +198,13 @@ class DAProvableTest extends TacticTestBase {
 
     println(pr)
   }
+
+  /*
+  it should "prove safety of train deceleration" in {
+    val fml = "x".asFormula
+  }
+
+  */
 
 }
 

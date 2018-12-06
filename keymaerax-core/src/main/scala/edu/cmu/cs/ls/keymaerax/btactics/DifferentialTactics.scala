@@ -197,6 +197,13 @@ private object DifferentialTactics extends Logging {
       DAS(pos) & allR(pos) & abstractionb(pos) & allR(pos) & dW(pos) & implyR(pos)
   })
 
+  /**
+    * DAInvariant: Differential invariants for DASystems
+    *
+    * @example{{{
+    *
+    * }}}
+    */
   lazy val DAInvariant: DependentPositionTactic =
     "dAI" by ((pos: Position, sequent: Sequent) => sequent.at(pos) match {
       case (ctx, Box(da@DASystem(DExists(vars, ode)), p)) =>
@@ -210,14 +217,27 @@ private object DifferentialTactics extends Logging {
   def DACut(formula: Formula): DependentPositionTactic =
     "dAC" byWithInput (formula, (pos: Position, sequent: Sequent) => sequent.at(pos) match {
       case (ctx, Box(da@DASystem(DExists(vars, ode)), p)) =>
-
-        useAt("DAC differential cut", PosInExpr(1::Nil),
-          (us:Option[Subst]) =>
-            us.getOrElse(throw BelleUnsupportedFailure("Unexpected missing substitution in DAC")) ++
-            RenUSubst(Seq(
-              (UnitPredicational("r",Except(Variable("x"))), formula)
-            ))
-        )(pos) & andR(pos)
+        /* Renaming hack */
+        val v = Variable("x")
+        if (!StaticSemantics(formula).fv.contains(v)) {
+          useAt("DAC differential cut", PosInExpr(1 :: Nil),
+            (us: Option[Subst]) =>
+              us.getOrElse(throw BelleUnsupportedFailure("Unexpected missing substitution in DAC")) ++
+                RenUSubst(Seq(
+                  (UnitPredicational("r", Except(v)), formula),
+                ))
+          )(pos) & andR(pos)
+        } else {
+          val vv = TacticHelper.freshNamedSymbol(v, sequent.glue(Sequent(IndexedSeq(), IndexedSeq((v.name + "=0").asFormula))))
+          uniformRename(v, vv) &
+          useAt("DAC differential cut", PosInExpr(1 :: Nil),
+            (us: Option[Subst]) =>
+              us.getOrElse(throw BelleUnsupportedFailure("Unexpected missing substitution in DAC")) ++
+                RenUSubst(Seq(
+                  (UnitPredicational("r", Except(v)), URename(v, vv)(formula))
+                ))
+          )(pos) & andR(pos)
+        }
         // problem: we want to unify and substitute the rest
         // before substituting the replacement of f(|x|)?, so that if the quantified variable is c,
         // then we allow x in new invariant
