@@ -201,7 +201,9 @@ private object DifferentialTactics extends Logging {
     * DAInvariant: Differential invariants for DASystems
     *
     * @example{{{
-    *
+    *    x>=0, c>=0 |- x>=0         c>=0 |- [x':=c]x'>=0
+    *  ------------------------------------------------------- DAInvariant(1)
+    *    x>=0 |- [\dexists {c} {x'=c & c>=0}]x>=0
     * }}}
     */
   lazy val DAInvariant: DependentPositionTactic =
@@ -209,11 +211,20 @@ private object DifferentialTactics extends Logging {
       case (ctx, Box(da@DASystem(DExists(vars, ode)), p)) =>
         useAt("DAI differential invariant")(pos) & andR(pos) <(
           allR('Rlast) & implyR('Rlast),
-          HilbertCalculus.derive('Rlast, PosInExpr(1::Nil)) & DAS('Rlast) & allR('Rlast) &
+          HilbertCalculus.derive('Rlast, PosInExpr(1::Nil)) & DAS('Rlast) & SaturateTactic(allR('Rlast)) &
             G('Rlast) & DE('Rlast) & DW('Rlast) & G('Rlast) & implyR('Rlast)
         )
     })
 
+  /**
+    * DACut: Differential cuts for DASystems
+    *
+    * @example{{{
+    *    y>=2 |- [\dexists {c} {y'=c & c>=1}]y>=1     y>=2 |- [\dexists {c} {y'=c & c>=1 & y>=1}]y>=0
+    *  ----------------------------------------------------------------------------------------------- DACut(y>=1)(1)
+    *    y>=2 |- [\dexists {c} {y'=c & c>=1}]y>=0
+    * }}}
+    */
   def DACut(formula: Formula): DependentPositionTactic =
     "dAC" byWithInput (formula, (pos: Position, sequent: Sequent) => sequent.at(pos) match {
       case (ctx, Box(da@DASystem(DExists(vars, ode)), p)) =>
