@@ -1974,6 +1974,14 @@ object DerivedAxioms extends Logging {
   )
 
   /** 15624 */
+  /**
+    * {{{Axiom "DAI differential invariant".
+    *   ([\dexists{x}{c&q(||)}]p(|x|)) <- ((\forall x (q(||) -> p(|x|))) & [\dexists{x}{c&q(||)}]((p(|x|))'))
+    * End.
+    * }}}
+    *
+    * @Derived
+    */
   lazy val DAIinvariant = derivedAxiom("DAI differential invariant",
     Sequent(IndexedSeq(), IndexedSeq("([\\dexists{x}{c&q(||)}]p(|x|)) <- ((\\forall x (q(||) -> p(|x|))) & [\\dexists{x}{c&q(||)}]((p(|x|))'))".asFormula)),
     implyR(1) & andL(-1) & useAt("[?] test", PosInExpr(1::Nil))(-1, PosInExpr(0::Nil)) &
@@ -1984,6 +1992,14 @@ object DerivedAxioms extends Logging {
       )
   )
 
+  /**
+    * {{{Axiom "DAC differential cut".
+    *   ([\dexists{x}{c&q(||)}]p(||)) <- ([\dexists{x}{c&q(||)&r(|x|)}]p(||) & [\dexists{x}{c&q(||)}]r(|x|))
+    * End.
+    * }}}
+    *
+    * @Derived
+    */
   lazy val DADiffCut = derivedAxiom("DAC differential cut",
     Sequent(IndexedSeq(), IndexedSeq("([\\dexists{x}{c&q(||)}]p(||)) <- ([\\dexists{x}{c&q(||)&r(|x|)}]p(||) & [\\dexists{x}{c&q(||)}]r(|x|))".asFormula)),
     implyR(1) & andL(-1) &
