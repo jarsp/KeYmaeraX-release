@@ -155,10 +155,43 @@ class DAProvableTest extends TacticTestBase {
     //println(pr)
   }
 
-  it should "DAI tactic" in {
-    val fml = "(v^2 <= 2*(b-u)*(m-z) & b>u & u>=0 & l>=0) -> [\\dexists{c}{x' = v, v' = a - l + c & c >= 0 & v >= 0}](x <= m)".asFormula
+  it should "DAI tactic" in withQE { _ =>
+    val fml = "(v^2 <= 2*(b-u)*(m-z) & b>u & u>=0 & l>=0) -> [\\dexists{c}{z' = v, v' = a - l + c & c >= 0 & v >= 0}](z <= m)".asFormula
     val pr = proveBy(fml,
-      implyR(1) & DAInvariant(1)
+      implyR(1) & DAInvariant(1) <(
+        QE & done,
+        Dassignb(1) & Dassignb(1)
+      )
+    )
+
+    // println(pr)
+  }
+
+  it should "handle const diffs" in withQE { _ =>
+    val fml = "z >= m -> [{z'=1}]z >= m".asFormula
+    val pr = proveBy(fml,
+      implyR(1) &
+      Dconstify(DI(1) & implyR(1) & andR(1) <(
+        QE & done,
+        derive(1, PosInExpr(1::Nil)) & DifferentialTactics.DE(1) & Dassignb(1, PosInExpr(1::Nil)) &
+        abstractionb(1) & QE
+      ))(1)
+    )
+
+    println(pr)
+  }
+
+  it should "prove invariant with DAI" in withQE { _ =>
+    val fml = "v^2 <= 2*(b-u)*(m-z) & b > u & u >= 0 & l >= 0 ==> [\\dexists{d}{z'=v, v'=-b+d & -l<=d & d<=u & v>=0}](z <= m)".asSequent
+    val pr = proveBy(fml,
+      andL(-1) & DACut("v^2 <= 2*(b-u)*(m-z) & b > u & u >= 0 & l >= 0".asFormula)(1) <(
+        //DAS(1) & allR(1) & abstractionb(1) & SaturateTactic(allR(1)) & dW(1) & implyR(1) & QE,
+        DAWeaken(1) & QE,
+        Dconstify(DAInvariant(1) <(
+          QE,
+          Dassignb(1)*2 & QE
+        ))(1)
+      )
     )
 
     println(pr)
@@ -196,7 +229,7 @@ class DAProvableTest extends TacticTestBase {
       implyR(1) & DACut("z >= 5".asFormula)(1, PosInExpr(Nil))
     )
 
-    println(pr)
+    // println(pr)
   }
 
   /*

@@ -194,7 +194,7 @@ private object DifferentialTactics extends Logging {
       // abstractionb is GV
 
       // 15624 TODO: Check safety and how to make more robust
-      DAS(pos) & allR(pos) & abstractionb(pos) & allR(pos) & dW(pos) & implyR(pos)
+      DAS(pos) & allR(pos) & abstractionb(pos) & SaturateTactic(allR(pos)) & dW(pos) & implyR(pos)
   })
 
   /**
@@ -482,6 +482,16 @@ private object DifferentialTactics extends Logging {
           let(FuncOf(Function(c.name, c.index, Unit, c.sort), Nothing), c, tactic))
       case Some(Diamond(ode@ODESystem(_, _), p)) =>
         val consts = (StaticSemantics.freeVars(p) -- StaticSemantics.boundVars(ode)).toSet.filter(_.isInstanceOf[BaseVariable])
+        consts.foldLeft[BelleExpr](inner)((tactic, c) =>
+          let(FuncOf(Function(c.name, c.index, Unit, c.sort), Nothing), c, tactic))
+
+      /** 15624 */
+      case Some(Box(da@DASystem(DExists(vars, ode)), p)) =>
+        val consts = (StaticSemantics.freeVars(p) -- StaticSemantics.boundVars(da)).toSet.filter(_.isInstanceOf[BaseVariable])
+        consts.foldLeft[BelleExpr](inner)((tactic, c) =>
+          let(FuncOf(Function(c.name, c.index, Unit, c.sort), Nothing), c, tactic))
+      case Some(Diamond(da@DASystem(DExists(vars, ode)), p)) =>
+        val consts = (StaticSemantics.freeVars(p) -- StaticSemantics.boundVars(da)).toSet.filter(_.isInstanceOf[BaseVariable])
         consts.foldLeft[BelleExpr](inner)((tactic, c) =>
           let(FuncOf(Function(c.name, c.index, Unit, c.sort), Nothing), c, tactic))
     }
