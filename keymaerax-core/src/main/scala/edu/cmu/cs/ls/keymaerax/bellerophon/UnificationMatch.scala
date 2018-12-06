@@ -11,7 +11,7 @@ import edu.cmu.cs.ls.keymaerax.core._
 import org.apache.logging.log4j.scala.Logging
 
 import scala.collection.immutable
-import scala.collection.immutable.{List, Nil}
+import scala.collection.immutable.{List, Nil, Seq}
 import scala.util.Try
 
 /**
@@ -213,6 +213,26 @@ abstract class SchematicUnificationMatch extends BaseMatcher {
       //@todo incomplete: match [a;]p() -> [a;]p() with [x:=x+1;]y>0 -> [x:=x+1;]y>0  will fail since both pieces need to be unified and then combined subsequently. But that's okay for now
     }
   }
+  /** 15624 */
+  protected def unifies(s1: immutable.Seq[Variable], s2: Expression, t1: immutable.Seq[Variable], t2: Expression): List[SubstRepl] = {
+    for (pv <- t1.permutations) {
+      var u1 = unify(s1.head, t1.head)
+      for ((v1, v2) <- s1.tail.zip(pv.tail)) {
+        u1 = compose(unify(v1, v2), u1)
+      }
+      try {
+        return compose(unify(Subst(u1)(s2), t2), u1)
+      } catch {
+        case _: ProverException =>
+      }
+    }
+    // Not entirely sure how to raise proverexception so just throwing here
+    var u1 = unify(s1.head, t1.head)
+    for ((v1, v2) <- s1.tail.zip(t1.tail)) {
+      u1 = compose(unify(v1, v2), u1)
+    }
+    compose(unify(Subst(u1)(s2), t2), u1)
+  }
   protected def unifies(s1:Term,s2:Term, t1:Term,t2:Term): List[SubstRepl] = {
     val u1 = unify(s1, t1)
     try {
@@ -360,9 +380,9 @@ abstract class SchematicUnificationMatch extends BaseMatcher {
 
     /** 15624: Unification for DASystems */
     case DASystem(child)             => e2 match {case DASystem(child2) => unify(child, child2) case _ => ununifiable(e1, e2)}
-    case DExists(v, ode) if v.length == 1 =>
+    case DExists(v, ode) =>
       e2 match {
-        case DExists(v2, ode2) if v2.length == 1 => unifies(v.head, ode, v2.head, ode2)
+        case DExists(v2, ode2) if v2.length == v.length => unifies(v, ode, v2, ode2)
         case _ => ununifiable(e1,e2)
       }
   }
