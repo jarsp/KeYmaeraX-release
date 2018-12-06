@@ -54,9 +54,6 @@ case class Tuple(left: Sort, right: Sort) extends Sort { override def toString =
 /** User-defined object sort */
 case class ObjectSort(name : String) extends Sort { override def toString = name }
 
-/** 15624: Sort of variable lists */
-//object VariableListSort extends Sort { override def toString = "VariableList" }
-
 /** Sorts of state spaces for state-dependent operators */
 sealed trait Space
 /** The sort denoting the whole state space alias list of all variables as arguments \bar{x} (axioms that allow any variable dependency) */
@@ -181,14 +178,6 @@ sealed trait SpaceDependent extends StateDependent {
   val space: Space
   final val index: Option[Int] = None
 }
-
-/** 15624: Expression representing variable lists */
-/*sealed trait VariableListT extends Expression {
-  final val kind = TermKind
-  final val sort = VariableListSort
-  val xs: immutable.Seq[Variable]
-  override def toString: String = "{" + xs.map(KeYmaeraXPrettyPrinter.stringify).mkString(" ") + "}"
-}*/
 
 
 
@@ -370,10 +359,6 @@ case class Pair(left: Term, right: Term) extends BinaryCompositeTerm {
   final val sort: Sort = Tuple(left.sort, right.sort)
 }
 
-/** 15624: Case class for variable lists */
-/*case class VariableList(xs: immutable.Seq[Variable]) extends VariableListT {
-  def reapply = copy _
-}*/
 
 /*********************************************************************************
   * Formulas of differential dynamic logic
