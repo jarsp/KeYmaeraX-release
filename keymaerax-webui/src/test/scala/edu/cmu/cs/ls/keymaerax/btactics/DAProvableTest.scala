@@ -181,22 +181,6 @@ class DAProvableTest extends TacticTestBase {
     println(pr)
   }
 
-  it should "prove invariant with DAI" in withQE { _ =>
-    val fml = "v^2 <= 2*(b-u)*(m-z) & b > u & u >= 0 & l >= 0 ==> [\\dexists{d}{z'=v, v'=-b+d & -l<=d & d<=u & v>=0}](z <= m)".asSequent
-    val pr = proveBy(fml,
-      andL(-1) & DACut("v^2 <= 2*(b-u)*(m-z) & b > u & u >= 0 & l >= 0".asFormula)(1) <(
-        //DAS(1) & allR(1) & abstractionb(1) & SaturateTactic(allR(1)) & dW(1) & implyR(1) & QE,
-        DAWeaken(1) & QE,
-        Dconstify(DAInvariant(1) <(
-          QE,
-          Dassignb(1)*2 & QE
-        ))(1)
-      )
-    )
-
-    println(pr)
-  }
-
   it should "DAC differential cut easy" in withQE { _ =>
     val fml = "y >= 2 ==> [\\dexists{c}{y' = c & c >= 1}](y >= 0)".asSequent
     var pr = proveBy(fml,
