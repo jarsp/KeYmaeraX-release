@@ -355,8 +355,14 @@ abstract class SchematicUnificationMatch extends BaseMatcher {
 
     // pseudo-homomorphic cases
     //@todo join should be enough for the two unifiers in this case after they have been applied to the other side
-    case Forall(vars, g) if vars.length==1 => e2 match {case Forall(v2,g2) if v2.length==1 => unifies(vars.head,g, v2.head,g2) case _ => ununifiable(e1,e2)}
-    case Exists(vars, g) if vars.length==1 => e2 match {case Exists(v2,g2) if v2.length==1 => unifies(vars.head,g, v2.head,g2) case _ => ununifiable(e1,e2)}
+    case Forall(vars, g) => e2 match {
+      case Forall(v2,g2) if v2.length==vars.length => unifies(vars,g, v2,g2)
+      case _ => ununifiable(e1,e2)
+    }
+    case Exists(vars, g) => e2 match {
+      case Exists(v2,g2) if v2.length==vars.length => unifies(vars,g, v2,g2)
+      case _ => ununifiable(e1,e2)
+    }
 
     // homomorphic cases
     case Box(a, p)       => e2 match {case Box(a2,p2)     => unifies(a,p, a2,p2) case _ => ununifiable(e1,e2)}
