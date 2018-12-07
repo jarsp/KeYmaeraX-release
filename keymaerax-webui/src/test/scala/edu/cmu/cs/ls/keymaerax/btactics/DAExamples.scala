@@ -42,7 +42,7 @@ class DAExamples extends TacticTestBase {
   }
 
   it should "prove disturbed circular motion does not escape" in withMathematica { _ =>
-    val fml = "x^2 + y^2 = 1 -> [\\dexists{e} {x'=-y+e, y'=x & -1 <= e & e <= 1 & x*e <= 0}] x^2 + y^2 <= 1".asFormula
+    val fml = "x^2 + y^2 = 1 -> [\\dexists{e} {x'=-y+e, y'=x & x*e <= 0}] x^2 + y^2 <= 1".asFormula
     val pr = proveBy(fml,
       implyR(1) & Dconstify(DAInvariant(1) <(
         QE & done,
